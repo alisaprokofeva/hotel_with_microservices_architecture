@@ -1,8 +1,9 @@
 package demo.reservation.controller;
 
+import demo.reservation.model.ReservationResponseDto;
 import jakarta.validation.Valid;
 import demo.reservation.model.ReservationRequestDto;
-import demo.reservation.model.SearchByFilterResponseDto;
+import demo.reservation.model.SearchByFilterDto;
 import demo.reservation.service.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class ReservationController {
 
     @GetMapping("/{id}")
     //без RequestMapping надо было бы писать /reservation/{id}
-    public ResponseEntity<ReservationRequestDto> getReservationById(
+    public ResponseEntity<ReservationResponseDto> getReservationById(
             @PathVariable("id") Long id
     ){
         log.info("Called: getReservationById: id = "+id);
@@ -35,14 +36,14 @@ public class ReservationController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ReservationRequestDto>> getAllReservations(
+    public ResponseEntity<List<ReservationResponseDto>> getAllReservations(
             @RequestParam (name = "roomId", required = false) Long roomId,
             @RequestParam (name = "userId", required = false) Long userId,
             @RequestParam (name = "pageSize", required = false) Integer pageSize,
             @RequestParam (name = "pageNumber", required = false) Integer pageNumber
     ){
         log.info("Called: getAllReservations");
-        var filter = new SearchByFilterResponseDto(
+        var filter = new SearchByFilterDto(
                 roomId,
                 userId,
                 pageSize,
@@ -52,7 +53,7 @@ public class ReservationController {
     }
 
     @PostMapping()
-    public ResponseEntity<ReservationRequestDto> createReservation(
+    public ResponseEntity<ReservationResponseDto> createReservation(
             @RequestBody @Valid ReservationRequestDto reservationToCreate
     ){
         log.info("Called: createReservation");
@@ -61,7 +62,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReservationRequestDto> updateReservation(
+    public ResponseEntity<ReservationResponseDto> updateReservation(
             @PathVariable("id") Long id,
             @RequestBody @Valid ReservationRequestDto reservationToUpdate
     ){
@@ -79,7 +80,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<ReservationRequestDto> approveReservation(
+    public ResponseEntity<ReservationResponseDto> approveReservation(
             @PathVariable("id") Long id
     ){
         log.info("Called: approveReservation");

@@ -1,13 +1,14 @@
 package demo.reservation.mapper;
 
 import demo.reservation.model.ReservationRequestDto;
+import demo.reservation.model.ReservationResponseDto;
 import demo.reservation.model.entity.ReservationEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReservationMapper {
-    public ReservationRequestDto toDomain(ReservationEntity reservationEntity){
-        return new ReservationRequestDto(
+    public ReservationResponseDto toResponseDto(ReservationEntity reservationEntity){
+        return new ReservationResponseDto(
                 reservationEntity.getId(),
                 reservationEntity.getUserId(),
                 reservationEntity.getRoomId(),
@@ -18,12 +19,12 @@ public class ReservationMapper {
     }
     public ReservationEntity toEntity(ReservationRequestDto reservation){
         return new ReservationEntity(
-                reservation.id(),
-                reservation.userId(),
+                null,
+                null,
                 reservation.roomId(),
                 reservation.startDate(),
                 reservation.endDate(),
-                reservation.status()
+                null
         );
     }
 }

@@ -1,6 +1,6 @@
 package demo.reservation.model;
 
-public record SearchByFilterResponseDto(
+public record SearchByFilterDto(
         Long roomId,
         Long userId,
         Integer pageSize,

@@ -1,10 +1,11 @@
 package demo.reservation.service;
 
+import demo.reservation.model.ReservationResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;
 import demo.reservation.model.entity.ReservationEntity;
 import demo.reservation.mapper.ReservationMapper;
-import demo.reservation.model.SearchByFilterResponseDto;
+import demo.reservation.model.SearchByFilterDto;
 import demo.reservation.repository.ReservationRepository;
 import demo.reservation.model.ReservationStatus;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class ReservationService {
@@ -29,31 +31,30 @@ public class ReservationService {
         this.availabilityService = availabilityService;
     }
 
-    public ReservationRequestDto createReservation(ReservationRequestDto reservationToCreate) {
-        if(reservationToCreate.status()!=null){
-            throw new IllegalArgumentException("Status should be empty");
-        }
+    public ReservationResponseDto createReservation(ReservationRequestDto reservationToCreate) {
         if(!reservationToCreate.endDate().isAfter(reservationToCreate.startDate())){
             throw new IllegalArgumentException("Start date must be one day earlier than end date");
         }
 
         var entityToSave = reservationMapper.toEntity(reservationToCreate);
         entityToSave.setStatus(ReservationStatus.PENDING);
+        //временная заглушка
+        entityToSave.setUserId(ThreadLocalRandom.current().nextLong(1, 100));
         var savedEntity = repository.save(entityToSave);
-        return reservationMapper.toDomain(savedEntity);
+        return reservationMapper.toResponseDto(savedEntity);
     }
 
-    public ReservationRequestDto getReservationById(Long id) {
+    public ReservationResponseDto getReservationById(Long id) {
         ReservationEntity reservationEntity = repository.findById(id).orElseThrow(()->
                 new EntityNotFoundException
                 ("Not found reservation by id "+id));
 
-        return reservationMapper.toDomain(reservationEntity);
+        return reservationMapper.toResponseDto(reservationEntity);
     };
 
 
-    public List<ReservationRequestDto> searchAllByFilter(
-            SearchByFilterResponseDto filter
+    public List<ReservationResponseDto> searchAllByFilter(
+            SearchByFilterDto filter
     ) {
         int pageSize = filter.pageSize() != null ? filter.pageSize():10; //лучше вынести в applicationProperties
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber():0;
@@ -64,10 +65,10 @@ public class ReservationService {
                 pageable
         );
 
-        return allEntities.stream().map(reservationMapper::toDomain).toList();
+        return allEntities.stream().map(reservationMapper::toResponseDto).toList();
     }
 
-    public ReservationRequestDto updateReservation
+    public ReservationResponseDto updateReservation
             (Long id,
              ReservationRequestDto reservationToUpdate
     ) {
@@ -84,8 +85,9 @@ public class ReservationService {
         var reservationToSave = reservationMapper.toEntity((reservationToUpdate));
         reservationToSave.setStatus(ReservationStatus.PENDING);
         reservationToSave.setId(reservationEntity.getId());
+        reservationToSave.setId(reservationEntity.getUserId());
         var updateReservation = repository.save(reservationToSave);
-        return reservationMapper.toDomain(updateReservation);
+        return reservationMapper.toResponseDto(updateReservation);
     }
 
     @Transactional
@@ -104,7 +106,7 @@ public class ReservationService {
         log.info("Successfully cancelled reservation: id={}", id);
     }
 
-    public ReservationRequestDto approveReservation(Long id) {
+    public ReservationResponseDto approveReservation(Long id) {
 
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
@@ -120,6 +122,6 @@ public class ReservationService {
         }
         reservationEntity.setStatus(ReservationStatus.APPROVED);
         var approvedReservation = repository.save(reservationEntity);
-        return reservationMapper.toDomain(approvedReservation);
+        return reservationMapper.toResponseDto(approvedReservation);
     }
 }
