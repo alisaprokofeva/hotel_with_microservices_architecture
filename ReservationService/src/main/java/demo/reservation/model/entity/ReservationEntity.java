@@ -1,7 +1,7 @@
 package demo.reservation.model.entity;
 
 import jakarta.persistence.*;
-import demo.reservation.model.ReservationStatus;
+import demo.reservation.model.status.ReservationStatus;
 
 import java.time.LocalDate;
 

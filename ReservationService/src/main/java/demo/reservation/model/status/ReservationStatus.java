@@ -1,4 +1,4 @@
-package demo.reservation.model;
+package demo.reservation.model.status;
 
 public enum ReservationStatus {
     PENDING,
