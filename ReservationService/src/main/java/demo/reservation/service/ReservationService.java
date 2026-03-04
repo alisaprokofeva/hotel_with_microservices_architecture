@@ -7,7 +7,7 @@ import demo.reservation.model.entity.ReservationEntity;
 import demo.reservation.mapper.ReservationMapper;
 import demo.reservation.model.SearchByFilterDto;
 import demo.reservation.repository.ReservationRepository;
-import demo.reservation.model.ReservationStatus;
+import demo.reservation.model.status.ReservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;

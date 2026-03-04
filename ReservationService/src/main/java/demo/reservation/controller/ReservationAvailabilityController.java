@@ -1,7 +1,7 @@
 package demo.reservation.controller;
 
 import jakarta.validation.Valid;
-import demo.reservation.model.AvailabilityStatus;
+import demo.reservation.model.status.AvailabilityStatus;
 import demo.reservation.model.AvailabilityRequestDto;
 import demo.reservation.model.AvailabilityResponseDto;
 import demo.reservation.service.ReservationAvailabilityService;
