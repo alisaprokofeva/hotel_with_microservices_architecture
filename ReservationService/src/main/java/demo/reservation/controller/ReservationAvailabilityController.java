@@ -1,10 +1,10 @@
-package learnSpring.demo.reservation.controller;
+package demo.reservation.controller;
 
 import jakarta.validation.Valid;
-import learnSpring.demo.reservation.model.AvailabilityStatus;
-import learnSpring.demo.reservation.model.CheckAvailabilityRequest;
-import learnSpring.demo.reservation.model.CheckAvailabilityResponse;
-import learnSpring.demo.reservation.service.ReservationAvailabilityService;
+import demo.reservation.model.AvailabilityStatus;
+import demo.reservation.model.AvailabilityRequestDto;
+import demo.reservation.model.AvailabilityResponseDto;
+import demo.reservation.service.ReservationAvailabilityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,8 @@ public class ReservationAvailabilityController {
     }
 
     @PostMapping("/check")
-    public ResponseEntity<CheckAvailabilityResponse> checkAvailability(
-                  @Valid CheckAvailabilityRequest request
+    public ResponseEntity<AvailabilityResponseDto> checkAvailability(
+                  @Valid AvailabilityRequestDto request
     ){
         log.info("Called method cheakAvailability: request = {}", request);
         boolean isAvailable = service.isReservationAvailable(request.roomId(),
@@ -36,6 +36,6 @@ public class ReservationAvailabilityController {
                 : "Room not available to reservation";
         var status = isAvailable ? AvailabilityStatus.AVAILABLE :
                 AvailabilityStatus.RESERVED;
-        return ResponseEntity.status(HttpStatus.OK).body(new CheckAvailabilityResponse(message, status));
+        return ResponseEntity.status(HttpStatus.OK).body(new AvailabilityResponseDto(message, status));
     }
 }
