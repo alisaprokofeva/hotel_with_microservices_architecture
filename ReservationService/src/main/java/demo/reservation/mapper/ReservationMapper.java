@@ -11,20 +11,20 @@ public class ReservationMapper {
         return new ReservationResponseDto(
                 reservationEntity.getId(),
                 reservationEntity.getUserId(),
+                reservationEntity.getPaymentId(),
                 reservationEntity.getRoomId(),
                 reservationEntity.getStartDate(),
                 reservationEntity.getEndDate(),
-                reservationEntity.getStatus()
+                reservationEntity.getAmount(),
+                reservationEntity.getReservationStatus(),
+                reservationEntity.getPaymentStatus()
         );
     }
-    public ReservationEntity toEntity(ReservationRequestDto reservation){
-        return new ReservationEntity(
-                null,
-                null,
-                reservation.roomId(),
-                reservation.startDate(),
-                reservation.endDate(),
-                null
-        );
+    public ReservationEntity toEntity(ReservationRequestDto reservationRequestDto) {
+        ReservationEntity entity = new ReservationEntity();
+        entity.setRoomId(reservationRequestDto.roomId());
+        entity.setStartDate(reservationRequestDto.startDate());
+        entity.setEndDate(reservationRequestDto.endDate());
+        return entity;
     }
 }

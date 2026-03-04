@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import demo.reservation.model.ReservationRequestDto;
 import demo.reservation.model.SearchByFilterDto;
 import demo.reservation.service.ReservationService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,15 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservation")
+@RequiredArgsConstructor
 public class ReservationController {
 
     private static final Logger log = LoggerFactory.getLogger(ReservationController.class);
 
     private final ReservationService reservationService;
-
-    public ReservationController(ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @GetMapping("/{id}")
     //без RequestMapping надо было бы писать /reservation/{id}
