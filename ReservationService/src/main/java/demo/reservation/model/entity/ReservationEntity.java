@@ -1,87 +1,44 @@
 package demo.reservation.model.entity;
 
+import demo.payment.PaymentStatus;
 import jakarta.persistence.*;
 import demo.reservation.model.status.ReservationStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Table(name = "reservations")
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservationEntity {
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="user_id", nullable = false)
+    @Column(name="user_id")
     private Long userId;
+    @Column(name="payment_id")
+    private Long paymentId;
     @Column(name="room_id", nullable = false)
     private Long roomId;
     @Column(name="start_date", nullable = false)
     private LocalDate startDate;
     @Column(name="end_date", nullable = false)
     private LocalDate endDate;
+    @Column(name="amount")
+    private BigDecimal amount;
     @Enumerated(EnumType.STRING)
-    @Column(name="status", nullable = false)
-    private ReservationStatus status;
-
-    public ReservationEntity() {
-    }
-
-    public ReservationEntity(Long id, Long userId, Long roomId, LocalDate startDate, LocalDate endDate, ReservationStatus status) {
-        this.id = id;
-        this.userId = userId;
-        this.roomId = roomId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public ReservationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    @Column(name="reservation_status")
+    private ReservationStatus reservationStatus;
+    //надо вынести в общее, пока добавила какую то dependency
+    @Column(name="payment_status")
+    private PaymentStatus paymentStatus;
 }

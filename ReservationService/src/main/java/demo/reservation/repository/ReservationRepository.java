@@ -42,22 +42,22 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
 
     @Modifying
     @Query("update ReservationEntity r " +
-            "set r.status= :status " +
+            "set r.reservationStatus= :reservationStatus " +
             "where r.id= :id")
     void setStatus(@Param("id") Long id,
-                   @Param("status") ReservationStatus reservationStatus
+                   @Param("reservationStatus") ReservationStatus reservationStatus
     );
 
     @Query("SELECT r.id from ReservationEntity r " +
             "WHERE r.roomId = :roomId " +
             "AND :startDate < r.endDate " +
             "AND r.startDate < :endDate " +
-            "AND r.status = :status")
+            "AND r.reservationStatus = :reservationStatus")
     List<Long> findConflictReservationIds(
             @Param ("roomId") Long roomId,
             @Param ("startDate")LocalDate startDate,
             @Param ("endDate")LocalDate endDate,
-            @Param ("status") ReservationStatus status
+            @Param ("reservationStatus") ReservationStatus reservationStatus
     );
 
     @Query("SELECT r from ReservationEntity r " +

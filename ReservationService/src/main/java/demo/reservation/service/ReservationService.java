@@ -1,5 +1,6 @@
 package demo.reservation.service;
 
+import demo.payment.PaymentStatus;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -37,9 +39,13 @@ public class ReservationService {
         }
 
         var entityToSave = reservationMapper.toEntity(reservationToCreate);
-        entityToSave.setStatus(ReservationStatus.PENDING);
-        //временная заглушка
+        entityToSave.setReservationStatus(ReservationStatus.PENDING);
+        entityToSave.setPaymentStatus(PaymentStatus.NOT_APPLICABLE);
+
+        //временные заглушки (тк отсутствует список комнат+цен, и юзер сервис)
         entityToSave.setUserId(ThreadLocalRandom.current().nextLong(1, 100));
+        entityToSave.setAmount(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(3000, 10000)));
+
         var savedEntity = repository.save(entityToSave);
         return reservationMapper.toResponseDto(savedEntity);
     }
@@ -75,17 +81,19 @@ public class ReservationService {
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
 
-        if(reservationEntity.getStatus() != ReservationStatus.PENDING){
-            throw new IllegalStateException("Can't modify reservation: status = "+reservationEntity.getStatus());
+        if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
+            throw new IllegalStateException("Can't modify reservation: status = "+reservationEntity.getReservationStatus());
         }
         if(!reservationToUpdate.endDate().isAfter(reservationToUpdate.startDate())){
             throw new IllegalArgumentException("Start date must be one day earlier than end date");
         }
 
         var reservationToSave = reservationMapper.toEntity((reservationToUpdate));
-        reservationToSave.setStatus(ReservationStatus.PENDING);
+        reservationToSave.setReservationStatus(ReservationStatus.PENDING);
         reservationToSave.setId(reservationEntity.getId());
-        reservationToSave.setId(reservationEntity.getUserId());
+        reservationToSave.setUserId(reservationEntity.getUserId());
+        reservationToSave.setAmount(reservationEntity.getAmount());
+        reservationToSave.setPaymentId(reservationEntity.getPaymentId());
         var updateReservation = repository.save(reservationToSave);
         return reservationMapper.toResponseDto(updateReservation);
     }
@@ -94,11 +102,11 @@ public class ReservationService {
     public void cancelReservation(Long id) {
         var reservation = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found reservation by id: "+id));
-        if(reservation.getStatus().equals(ReservationStatus.APPROVED)){
+        if(reservation.getReservationStatus().equals(ReservationStatus.APPROVED)){
             throw new IllegalStateException("Can't cancel approved reservation. Contact" +
                     " with manager");
         }
-        if(reservation.getStatus().equals(ReservationStatus.CANCELLED)){
+        if(reservation.getReservationStatus().equals(ReservationStatus.CANCELLED)){
             throw new IllegalArgumentException("Can't cancel the reservation." +
                     " Reservation was already cancelled");
         }
@@ -111,8 +119,8 @@ public class ReservationService {
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
 
-        if(reservationEntity.getStatus() != ReservationStatus.PENDING){
-            throw new IllegalStateException("Can't approve reservation = "+reservationEntity.getStatus());
+        if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
+            throw new IllegalStateException("Can't approve reservation = "+reservationEntity.getReservationStatus());
         }
         var isAvailableToApprove = availabilityService.isReservationAvailable(reservationEntity.getRoomId(),
                 reservationEntity.getStartDate(),
@@ -120,7 +128,8 @@ public class ReservationService {
         if(!isAvailableToApprove){
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
-        reservationEntity.setStatus(ReservationStatus.APPROVED);
+        reservationEntity.setReservationStatus(ReservationStatus.APPROVED);
+        reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
         var approvedReservation = repository.save(reservationEntity);
         return reservationMapper.toResponseDto(approvedReservation);
     }

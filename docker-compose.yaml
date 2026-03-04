@@ -1,3 +1,4 @@
+name: reservations
 services:
   postgres:
     image: postgres:15
@@ -9,7 +10,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: orders
+      POSTGRES_DB: postgres
     healthcheck:
       test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 10s
