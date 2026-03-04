@@ -1,7 +1,7 @@
-package learnSpring.demo.reservation.model.entity;
+package demo.reservation.model.entity;
 
 import jakarta.persistence.*;
-import learnSpring.demo.reservation.model.ReservationStatus;
+import demo.reservation.model.ReservationStatus;
 
 import java.time.LocalDate;
 

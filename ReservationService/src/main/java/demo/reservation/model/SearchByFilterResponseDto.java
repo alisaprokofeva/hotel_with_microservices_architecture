@@ -1,6 +1,6 @@
-package learnSpring.demo.reservation.model;
+package demo.reservation.model;
 
-public record ReservationSearchFilter(
+public record SearchByFilterResponseDto(
         Long roomId,
         Long userId,
         Integer pageSize,

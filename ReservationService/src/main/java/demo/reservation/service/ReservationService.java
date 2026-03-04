@@ -1,12 +1,12 @@
-package learnSpring.demo.reservation.service;
+package demo.reservation.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import learnSpring.demo.reservation.model.Reservation;
-import learnSpring.demo.reservation.model.entity.ReservationEntity;
-import learnSpring.demo.reservation.mapper.ReservationMapper;
-import learnSpring.demo.reservation.model.ReservationSearchFilter;
-import learnSpring.demo.reservation.repository.ReservationRepository;
-import learnSpring.demo.reservation.model.ReservationStatus;
+import demo.reservation.model.ReservationRequestDto;
+import demo.reservation.model.entity.ReservationEntity;
+import demo.reservation.mapper.ReservationMapper;
+import demo.reservation.model.SearchByFilterResponseDto;
+import demo.reservation.repository.ReservationRepository;
+import demo.reservation.model.ReservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,7 @@ public class ReservationService {
         this.availabilityService = availabilityService;
     }
 
-    public Reservation createReservation(Reservation reservationToCreate) {
+    public ReservationRequestDto createReservation(ReservationRequestDto reservationToCreate) {
         if(reservationToCreate.status()!=null){
             throw new IllegalArgumentException("Status should be empty");
         }
@@ -43,7 +43,7 @@ public class ReservationService {
         return reservationMapper.toDomain(savedEntity);
     }
 
-    public Reservation getReservationById(Long id) {
+    public ReservationRequestDto getReservationById(Long id) {
         ReservationEntity reservationEntity = repository.findById(id).orElseThrow(()->
                 new EntityNotFoundException
                 ("Not found reservation by id "+id));
@@ -52,8 +52,8 @@ public class ReservationService {
     };
 
 
-    public List<Reservation> searchAllByFilter(
-            ReservationSearchFilter filter
+    public List<ReservationRequestDto> searchAllByFilter(
+            SearchByFilterResponseDto filter
     ) {
         int pageSize = filter.pageSize() != null ? filter.pageSize():10; //лучше вынести в applicationProperties
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber():0;
@@ -67,9 +67,9 @@ public class ReservationService {
         return allEntities.stream().map(reservationMapper::toDomain).toList();
     }
 
-    public Reservation updateReservation
+    public ReservationRequestDto updateReservation
             (Long id,
-             Reservation reservationToUpdate
+             ReservationRequestDto reservationToUpdate
     ) {
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
@@ -104,7 +104,7 @@ public class ReservationService {
         log.info("Successfully cancelled reservation: id={}", id);
     }
 
-    public Reservation approveReservation(Long id) {
+    public ReservationRequestDto approveReservation(Long id) {
 
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
