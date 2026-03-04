@@ -1,7 +1,7 @@
-package learnSpring.demo.reservation.service;
+package demo.reservation.service;
 
-import learnSpring.demo.reservation.repository.ReservationRepository;
-import learnSpring.demo.reservation.model.ReservationStatus;
+import demo.reservation.repository.ReservationRepository;
+import demo.reservation.model.status.ReservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,10 @@
-package learnSpring.demo.reservation.model;
+package demo.reservation.model;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public record CheckAvailabilityRequest(
+public record AvailabilityRequestDto(
         @NotNull
         Long roomId,
         @NotNull

@@ -1,7 +1,7 @@
-package learnSpring.demo.reservation.repository;
+package demo.reservation.repository;
 
-import learnSpring.demo.reservation.model.entity.ReservationEntity;
-import learnSpring.demo.reservation.model.ReservationStatus;
+import demo.reservation.model.entity.ReservationEntity;
+import demo.reservation.model.status.ReservationStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

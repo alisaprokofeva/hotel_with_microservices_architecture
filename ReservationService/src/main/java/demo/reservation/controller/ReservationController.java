@@ -1,9 +1,10 @@
-package learnSpring.demo.reservation.controller;
+package demo.reservation.controller;
 
+import demo.reservation.model.ReservationResponseDto;
 import jakarta.validation.Valid;
-import learnSpring.demo.reservation.model.Reservation;
-import learnSpring.demo.reservation.model.ReservationSearchFilter;
-import learnSpring.demo.reservation.service.ReservationService;
+import demo.reservation.model.ReservationRequestDto;
+import demo.reservation.model.SearchByFilterDto;
+import demo.reservation.service.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class ReservationController {
 
     @GetMapping("/{id}")
     //без RequestMapping надо было бы писать /reservation/{id}
-    public ResponseEntity<Reservation> getReservationById(
+    public ResponseEntity<ReservationResponseDto> getReservationById(
             @PathVariable("id") Long id
     ){
         log.info("Called: getReservationById: id = "+id);
@@ -35,14 +36,14 @@ public class ReservationController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Reservation>> getAllReservations(
+    public ResponseEntity<List<ReservationResponseDto>> getAllReservations(
             @RequestParam (name = "roomId", required = false) Long roomId,
             @RequestParam (name = "userId", required = false) Long userId,
             @RequestParam (name = "pageSize", required = false) Integer pageSize,
             @RequestParam (name = "pageNumber", required = false) Integer pageNumber
     ){
         log.info("Called: getAllReservations");
-        var filter = new ReservationSearchFilter(
+        var filter = new SearchByFilterDto(
                 roomId,
                 userId,
                 pageSize,
@@ -52,8 +53,8 @@ public class ReservationController {
     }
 
     @PostMapping()
-    public ResponseEntity<Reservation> createReservation(
-            @RequestBody @Valid Reservation reservationToCreate
+    public ResponseEntity<ReservationResponseDto> createReservation(
+            @RequestBody @Valid ReservationRequestDto reservationToCreate
     ){
         log.info("Called: createReservation");
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -61,9 +62,9 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(
+    public ResponseEntity<ReservationResponseDto> updateReservation(
             @PathVariable("id") Long id,
-            @RequestBody @Valid Reservation reservationToUpdate
+            @RequestBody @Valid ReservationRequestDto reservationToUpdate
     ){
         log.info("Called: updateReservation");
         return ResponseEntity.ok(reservationService.updateReservation(id, reservationToUpdate));
@@ -79,7 +80,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<Reservation> approveReservation(
+    public ResponseEntity<ReservationResponseDto> approveReservation(
             @PathVariable("id") Long id
     ){
         log.info("Called: approveReservation");

@@ -1,4 +1,4 @@
-package learnSpring.demo.web;
+package demo.web;
 
 
 import jakarta.persistence.EntityNotFoundException;

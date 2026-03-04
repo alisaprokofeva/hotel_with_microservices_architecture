@@ -1,13 +1,14 @@
-package learnSpring.demo.reservation.mapper;
+package demo.reservation.mapper;
 
-import learnSpring.demo.reservation.model.Reservation;
-import learnSpring.demo.reservation.model.entity.ReservationEntity;
+import demo.reservation.model.ReservationRequestDto;
+import demo.reservation.model.ReservationResponseDto;
+import demo.reservation.model.entity.ReservationEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReservationMapper {
-    public Reservation toDomain(ReservationEntity reservationEntity){
-        return new Reservation(
+    public ReservationResponseDto toResponseDto(ReservationEntity reservationEntity){
+        return new ReservationResponseDto(
                 reservationEntity.getId(),
                 reservationEntity.getUserId(),
                 reservationEntity.getRoomId(),
@@ -16,14 +17,14 @@ public class ReservationMapper {
                 reservationEntity.getStatus()
         );
     }
-    public ReservationEntity toEntity(Reservation reservation){
+    public ReservationEntity toEntity(ReservationRequestDto reservation){
         return new ReservationEntity(
-                reservation.id(),
-                reservation.userId(),
+                null,
+                null,
                 reservation.roomId(),
                 reservation.startDate(),
                 reservation.endDate(),
-                reservation.status()
+                null
         );
     }
 }
