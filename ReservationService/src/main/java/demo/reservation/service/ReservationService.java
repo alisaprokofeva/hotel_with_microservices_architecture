@@ -1,5 +1,8 @@
 package demo.reservation.service;
 
+import demo.reservation.external.PaymentHttpClient;
+import demo.reservation.external.PaymentRequestDto;
+import demo.reservation.external.PaymentResponseDto;
 import demo.reservation.kafka.CleaningAssignedEvent;
 import demo.reservation.kafka.ReservationPaidEvent;
 import demo.reservation.model.status.CleaningStatus;
@@ -31,11 +34,13 @@ public class ReservationService {
     private final ReservationRepository repository;
     private final ReservationMapper reservationMapper;
     private final ReservationAvailabilityService availabilityService;
+    private final PaymentHttpClient paymentHttpClient;
 
-    public ReservationService(ReservationRepository repository, ReservationMapper reservationMapper, ReservationAvailabilityService availabilityService){
+    public ReservationService(ReservationRepository repository, ReservationMapper reservationMapper, ReservationAvailabilityService availabilityService, PaymentHttpClient paymentHttpClient){
         this.repository = repository;
         this.reservationMapper = reservationMapper;
         this.availabilityService = availabilityService;
+        this.paymentHttpClient = paymentHttpClient;
     }
 
     public ReservationResponseDto createReservation(ReservationRequestDto reservationToCreate) {
@@ -134,12 +139,39 @@ public class ReservationService {
         if(!isAvailableToApprove){
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
-        //makePayment
-        reservationEntity.setReservationStatus(ReservationStatus.APPROVED);
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
-        var approvedReservation = repository.save(reservationEntity);
-        return reservationMapper.toResponseDto(approvedReservation);
+        //makePayment
+        var request = new PaymentRequestDto(
+                id,
+                reservationEntity.getAmount()
+        );
+        log.info("Approving reservation: id={}", id);
+        var response = processPayment(id, request);
+        log.info("Successfully approved reservation: id={}", id);
+        return reservationMapper.toResponseDto(response);
     }
+
+    public ReservationEntity processPayment(Long id, PaymentRequestDto request) {
+        var reservationEntity = getReservationOrThrow(id);
+
+        //??
+        if(!reservationEntity.getPaymentStatus().equals(PaymentStatus.PENDING_PAYMENT)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment status is not PENDING");
+        }
+
+        var response = paymentHttpClient.createPayment(PaymentRequestDto.builder()
+                .reservationId(reservationEntity.getId())
+                .amount(reservationEntity.getAmount())
+                .build());
+
+        var status = response.paymentStatus().equals(PaymentStatus.PAID)
+                ? ReservationStatus.APPROVED
+                : ReservationStatus.PENDING;
+
+        reservationEntity.setReservationStatus(status);
+        return repository.save(reservationEntity);
+    }
+
 
     //метод для paymentService, в параметрах также должен быть респонс с номером комнаты и номером бронирования
     //(основной id)

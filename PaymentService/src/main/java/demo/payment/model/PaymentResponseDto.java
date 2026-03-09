@@ -3,7 +3,7 @@
 package demo.payment.model;
 
 import demo.payment.model.status.PaymentStatus;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 

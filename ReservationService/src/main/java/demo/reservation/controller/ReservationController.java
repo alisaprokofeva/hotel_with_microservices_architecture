@@ -1,5 +1,7 @@
 package demo.reservation.controller;
 
+import demo.reservation.external.PaymentRequestDto;
+import demo.reservation.mapper.ReservationMapper;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.validation.Valid;
 import demo.reservation.model.ReservationRequestDto;
@@ -22,6 +24,8 @@ public class ReservationController {
     private static final Logger log = LoggerFactory.getLogger(ReservationController.class);
 
     private final ReservationService reservationService;
+
+    private final ReservationMapper reservationMapper;
 
     @GetMapping("/{id}")
     //без RequestMapping надо было бы писать /reservation/{id}
@@ -85,5 +89,15 @@ public class ReservationController {
         var reservation = reservationService.approveReservation(id);
         return ResponseEntity.ok(reservation);
     }
+
+//    @PostMapping("/{id}/pay")
+//    public ResponseEntity<ReservationResponseDto> payReservation(
+//            @PathVariable("id") Long id,
+//            @RequestBody PaymentRequestDto paymentRequestDto
+//    ){
+//        var entity = reservationService.processPayment(id, paymentRequestDto);
+//        return reservationMapper.toResponseDto(entity);
+//    }
+//
 
 }

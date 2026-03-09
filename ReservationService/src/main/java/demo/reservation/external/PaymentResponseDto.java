@@ -1,15 +1,22 @@
 //общая папка
 
-package demo.payment.model;
+package demo.reservation.external;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
-public record PaymentRequestDto(
+@Builder
+public record PaymentResponseDto(
+        @NotNull
+        Long paymentId,
         @NotNull
         Long reservationId,
         @NotNull
+        PaymentStatus paymentStatus,
+        @NotNull
         BigDecimal amount
+
 ) {
 }
