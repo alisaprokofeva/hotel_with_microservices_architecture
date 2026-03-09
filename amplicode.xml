@@ -12,6 +12,11 @@
           <package value="demo" />
         </packages>
       </persistence-unit>
+      <persistence-unit moduleName="payment" name="Default">
+        <packages>
+          <package value="demo.payment" />
+        </packages>
+      </persistence-unit>
     </persistence-units>
   </component>
 </project>

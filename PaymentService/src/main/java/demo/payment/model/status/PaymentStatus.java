@@ -1,4 +1,6 @@
-package demo.payment;
+//общая папка
+
+package demo.payment.model.status;
 
 public enum PaymentStatus {
     NOT_APPLICABLE,
