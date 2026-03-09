@@ -1,4 +1,15 @@
+//общая папка
+
 package demo.payment;
 
-public record PaymentRequestDto() {
+import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
+
+public record PaymentRequestDto(
+        @NotNull
+        Long reservationId,
+        @NotNull
+        BigDecimal amount
+) {
 }

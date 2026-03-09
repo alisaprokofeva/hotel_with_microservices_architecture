@@ -1,3 +1,5 @@
+//общая папка
+
 package demo.payment;
 
 public enum PaymentStatus {
