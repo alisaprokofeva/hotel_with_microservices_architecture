@@ -1,6 +1,6 @@
 //общая папка
 
-package demo.payment;
+package demo.payment.model;
 
 import org.jetbrains.annotations.NotNull;
 

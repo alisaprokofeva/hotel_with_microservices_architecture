@@ -1,6 +1,6 @@
 package demo.reservation.service;
 
-import demo.payment.PaymentStatus;
+import demo.payment.model.status.PaymentStatus;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;

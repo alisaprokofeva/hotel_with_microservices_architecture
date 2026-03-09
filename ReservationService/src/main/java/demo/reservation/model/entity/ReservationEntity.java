@@ -1,6 +1,6 @@
 package demo.reservation.model.entity;
 
-import demo.payment.PaymentStatus;
+import demo.payment.model.status.PaymentStatus;
 import jakarta.persistence.*;
 import demo.reservation.model.status.ReservationStatus;
 import lombok.AllArgsConstructor;

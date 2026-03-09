@@ -1,7 +1,8 @@
 //общая папка
 
-package demo.payment;
+package demo.payment.model;
 
+import demo.payment.model.status.PaymentStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;

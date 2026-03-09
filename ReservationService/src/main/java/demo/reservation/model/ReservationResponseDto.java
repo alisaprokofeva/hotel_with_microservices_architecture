@@ -1,6 +1,6 @@
 package demo.reservation.model;
 
-import demo.payment.PaymentStatus;
+import demo.payment.model.status.PaymentStatus;
 import demo.reservation.model.status.ReservationStatus;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;

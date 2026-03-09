@@ -1,7 +1,12 @@
 //убрать lesson1 из pom.xml (name)
 
-package demo.payment;
+package demo.payment.service;
 
+import demo.payment.repository.PaymentRepository;
+import demo.payment.mapper.PaymentMapper;
+import demo.payment.model.PaymentRequestDto;
+import demo.payment.model.PaymentResponseDto;
+import demo.payment.model.status.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
