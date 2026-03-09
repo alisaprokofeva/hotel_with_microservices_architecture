@@ -23,19 +23,19 @@ public class PaymentService {
             return paymentMapper.toResponseDto(found.get());
         }
 
-        var entity = paymentMapper.toEntity(requestDto);
+        var paymentEntity = paymentMapper.toEntity(requestDto);
 
         //заглушка
-        PaymentStatus status;
+        PaymentStatus paymentStatus;
         if(requestDto.amount().intValue() % 2 == 0){
-            status = PaymentStatus.PAYMENT_FAILED;
+            paymentStatus = PaymentStatus.PAYMENT_FAILED;
         }
         else{
-            status = PaymentStatus.PAID;
+            paymentStatus = PaymentStatus.PAID;
         }
-        entity.setPaymentStatus(status);
+        paymentEntity.setPaymentStatus(paymentStatus);
 
-        var savedEntity = paymentRepository.save(entity);
-        return paymentMapper.toResponseDto(entity);
+        var savedEntity = paymentRepository.save(paymentEntity);
+        return paymentMapper.toResponseDto(savedEntity);
     }
 }
