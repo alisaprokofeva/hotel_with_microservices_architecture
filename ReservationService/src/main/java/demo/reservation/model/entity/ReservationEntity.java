@@ -1,6 +1,7 @@
 package demo.reservation.model.entity;
 
-import demo.payment.model.status.PaymentStatus;
+import demo.reservation.model.status.CleaningStatus;
+import demo.reservation.model.status.PaymentStatus;
 import jakarta.persistence.*;
 import demo.reservation.model.status.ReservationStatus;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,13 @@ public class ReservationEntity {
     @Column(name="reservation_status")
     private ReservationStatus reservationStatus;
     //надо вынести в общее, пока добавила какую то dependency
+    @Enumerated(EnumType.STRING)
     @Column(name="payment_status")
     private PaymentStatus paymentStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name="cleaning_status")
+    private CleaningStatus cleaningStatus;
+    @Column(name = "cleaner_id")
+    private Long cleanerId;
+
 }

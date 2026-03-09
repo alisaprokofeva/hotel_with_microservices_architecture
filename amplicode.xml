@@ -2,9 +2,14 @@
 <project version="4">
   <component name="AmplicodePersistenceUnitSettings">
     <persistence-units>
+      <persistence-unit moduleName="CleaningService" name="Default">
+        <packages>
+          <package value="demo.cleaningservice" />
+        </packages>
+      </persistence-unit>
       <persistence-unit moduleName="demo" name="Default">
         <packages>
-          <package value="learnSpring.demo" />
+          <package value="demo" />
         </packages>
       </persistence-unit>
       <persistence-unit moduleName="payment" name="Default">
