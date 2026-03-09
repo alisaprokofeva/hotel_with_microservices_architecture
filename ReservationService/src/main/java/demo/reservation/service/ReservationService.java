@@ -1,6 +1,9 @@
 package demo.reservation.service;
 
-import demo.payment.PaymentStatus;
+import demo.reservation.kafka.CleaningAssignedEvent;
+import demo.reservation.kafka.ReservationPaidEvent;
+import demo.reservation.model.status.CleaningStatus;
+import demo.reservation.model.status.PaymentStatus;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;
@@ -12,8 +15,10 @@ import demo.reservation.model.status.ReservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -94,6 +99,7 @@ public class ReservationService {
         reservationToSave.setUserId(reservationEntity.getUserId());
         reservationToSave.setAmount(reservationEntity.getAmount());
         reservationToSave.setPaymentId(reservationEntity.getPaymentId());
+        //тут может все лечь из-за пустых полей с клинером и статусом
         var updateReservation = repository.save(reservationToSave);
         return reservationMapper.toResponseDto(updateReservation);
     }
@@ -128,9 +134,34 @@ public class ReservationService {
         if(!isAvailableToApprove){
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
+        //makePayment
         reservationEntity.setReservationStatus(ReservationStatus.APPROVED);
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
         var approvedReservation = repository.save(reservationEntity);
         return reservationMapper.toResponseDto(approvedReservation);
     }
+
+    //метод для paymentService, в параметрах также должен быть респонс с номером комнаты и номером бронирования
+    //(основной id)
+    //в моменте после прохода оплаты сервиса в основной бд в данном номере будет стоять что номер грязный
+    //так
+    private void sendReservationPaidEvent(ReservationEntity reservationEntity ) {}
+
+    public void processCleaningAssigned(CleaningAssignedEvent cleaningAssignedEvent) {
+        var reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
+        if(!reservation.getPaymentStatus().equals(PaymentStatus.PAID)){
+            throw new IllegalStateException("Can't process cleaning assigned reservation");
+        }
+        reservation.setCleaningStatus(CleaningStatus.CLEAR);
+        reservation.setCleanerId(cleaningAssignedEvent.cleanerId());
+        repository.save(reservation);
+    }
+
+    //вспомогательный приватный метод для processCleaningAssigned
+    private ReservationEntity getReservationOrThrow(Long id){
+        var reservationEntityOptional = repository.findById(id);
+        return reservationEntityOptional.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
+    }
+
 }

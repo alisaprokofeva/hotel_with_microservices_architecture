@@ -17,7 +17,9 @@ public class ReservationMapper {
                 reservationEntity.getEndDate(),
                 reservationEntity.getAmount(),
                 reservationEntity.getReservationStatus(),
-                reservationEntity.getPaymentStatus()
+                reservationEntity.getPaymentStatus(),
+                reservationEntity.getCleaningStatus(),
+                reservationEntity.getCleanerId()
         );
     }
     public ReservationEntity toEntity(ReservationRequestDto reservationRequestDto) {

@@ -26,7 +26,7 @@ public class KafkaConfiguration {
     private final KafkaProperties properties;
 
     @Bean
-    public DefaultKafkaProducerFactory<Long, CleaningAssignedEvent> kafkaConsumerFactory(
+    public DefaultKafkaProducerFactory<Long, CleaningAssignedEvent> cleaningAssignedEventProducerFactory(
             KafkaProperties properties) {
         Map<String, Object> producerProperties = properties.buildProducerProperties();
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
@@ -35,10 +35,10 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    KafkaTemplate<Long, CleaningAssignedEvent> deliveryAssignedEventKafkaTemplate(
-            DefaultKafkaProducerFactory<Long, CleaningAssignedEvent> deliveryAssignedEventProducerFactory
+    KafkaTemplate<Long, CleaningAssignedEvent> cleaningAssignedEventKafkaTemplate(
+            DefaultKafkaProducerFactory<Long, CleaningAssignedEvent> cleaningAssignedEventProducerFactory
     ) {
-        return new KafkaTemplate<>(deliveryAssignedEventProducerFactory);
+        return new KafkaTemplate<>(cleaningAssignedEventProducerFactory);
     }
 
     @Bean

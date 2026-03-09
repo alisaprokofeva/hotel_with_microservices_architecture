@@ -1,7 +1,9 @@
 package demo.reservation.model;
 
-import demo.payment.PaymentStatus;
+import demo.reservation.model.status.PaymentStatus;
+import demo.reservation.model.status.CleaningStatus;
 import demo.reservation.model.status.ReservationStatus;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -27,6 +29,8 @@ public record ReservationResponseDto(
         @NotNull
         BigDecimal amount,
         ReservationStatus reservationStatus,
-        PaymentStatus paymentStatus
+        PaymentStatus paymentStatus,
+        CleaningStatus cleaningStatus,
+        Long cleanerId
 ){
 }
