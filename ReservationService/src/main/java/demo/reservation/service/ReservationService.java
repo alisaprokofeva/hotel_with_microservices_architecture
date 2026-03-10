@@ -140,9 +140,8 @@ public class ReservationService {
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
-        // сохраняем статус перед оплатой, чтобы processPayment увидел PENDING_PAYMENT
-        reservationEntity = repository.save(reservationEntity);
-
+        reservationEntity =  repository.save(reservationEntity);
+        //makePayment
         var request = new PaymentRequestDto(
                 id,
                 reservationEntity.getAmount()
@@ -166,19 +165,15 @@ public class ReservationService {
                 .amount(reservationEntity.getAmount())
                 .build());
 
-        demo.reservation.external.PaymentStatus externalStatus = response.paymentStatus();
-
-        var reservationStatus = externalStatus == demo.reservation.external.PaymentStatus.PAID
-                ? ReservationStatus.APPROVED
-                : ReservationStatus.PENDING;
-
-        reservationEntity.setReservationStatus(reservationStatus);
+//        var status = response.paymentStatus().equals(PaymentStatus.PAID)
+//                ? ReservationStatus.APPROVED
+//                : ReservationStatus.PENDING;
+        //тест
+        var status = ReservationStatus.APPROVED;
+        reservationEntity.setReservationStatus(status);
         reservationEntity.setPaymentId(response.paymentId());
-        reservationEntity.setPaymentStatus(
-                externalStatus == demo.reservation.external.PaymentStatus.PAID
-                        ? PaymentStatus.PAID
-                        : PaymentStatus.PAYMENT_FAILED
-        );
+//        reservationEntity.setPaymentStatus(response.paymentStatus());
+
         return repository.save(reservationEntity);
     }
 

@@ -4,7 +4,7 @@
     <persistence-units>
       <persistence-unit moduleName="demo" name="Default">
         <packages>
-          <package value="demo" />
+          <package value="learnSpring.demo" />
         </packages>
       </persistence-unit>
       <persistence-unit moduleName="CleaningService" name="Default">
