@@ -5,8 +5,9 @@
 
 package demo.cleaningservice.domain;
 
-import demo.cleaningservice.kafka.CleaningAssignedEvent;
-import demo.cleaningservice.kafka.ReservationPaidEvent;
+import demo.common.kafka.CleaningAssignedEvent;
+import demo.common.kafka.ReservationPaidEvent;
+import demo.common.model.status.CleaningStatus;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

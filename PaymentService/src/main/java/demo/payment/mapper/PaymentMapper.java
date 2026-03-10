@@ -1,7 +1,7 @@
 package demo.payment.mapper;
 
-import demo.payment.model.PaymentRequestDto;
-import demo.payment.model.PaymentResponseDto;
+import demo.common.model.dto.PaymentRequestDto;
+import demo.common.model.dto.PaymentResponseDto;
 import demo.payment.model.entity.PaymentEntity;
 import org.springframework.stereotype.Component;
 

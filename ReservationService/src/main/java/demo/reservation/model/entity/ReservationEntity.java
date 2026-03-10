@@ -1,7 +1,7 @@
 package demo.reservation.model.entity;
 
-import demo.reservation.model.status.CleaningStatus;
-import demo.reservation.model.status.PaymentStatus;
+import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.PaymentStatus;
 import jakarta.persistence.*;
 import demo.reservation.model.status.ReservationStatus;
 import lombok.AllArgsConstructor;

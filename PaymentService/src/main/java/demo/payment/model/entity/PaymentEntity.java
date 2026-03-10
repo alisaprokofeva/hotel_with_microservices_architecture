@@ -1,6 +1,6 @@
 package demo.payment.model.entity;
 
-import demo.payment.model.status.PaymentStatus;
+import demo.common.model.status.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

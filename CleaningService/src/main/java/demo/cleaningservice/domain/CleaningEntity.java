@@ -1,12 +1,11 @@
 package demo.cleaningservice.domain;
 
+import demo.common.model.status.CleaningStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter

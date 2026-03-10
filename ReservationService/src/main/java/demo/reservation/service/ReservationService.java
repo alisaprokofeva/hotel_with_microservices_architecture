@@ -1,12 +1,10 @@
 package demo.reservation.service;
 
+import demo.common.kafka.CleaningAssignedEvent;
+import demo.common.model.dto.PaymentRequestDto;
+import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.PaymentStatus;
 import demo.reservation.external.PaymentHttpClient;
-import demo.reservation.external.PaymentRequestDto;
-import demo.reservation.external.PaymentResponseDto;
-import demo.reservation.kafka.CleaningAssignedEvent;
-import demo.reservation.kafka.ReservationPaidEvent;
-import demo.reservation.model.status.CleaningStatus;
-import demo.reservation.model.status.PaymentStatus;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;
@@ -165,11 +163,10 @@ public class ReservationService {
                 .amount(reservationEntity.getAmount())
                 .build());
 
-//        var status = response.paymentStatus().equals(PaymentStatus.PAID)
-//                ? ReservationStatus.APPROVED
-//                : ReservationStatus.PENDING;
+        var status = response.paymentStatus().equals(PaymentStatus.PAID)
+                ? ReservationStatus.APPROVED
+                : ReservationStatus.PENDING;
         //тест
-        var status = ReservationStatus.APPROVED;
         reservationEntity.setReservationStatus(status);
         reservationEntity.setPaymentId(response.paymentId());
 //        reservationEntity.setPaymentStatus(response.paymentStatus());

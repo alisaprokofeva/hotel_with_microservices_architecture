@@ -1,5 +1,7 @@
 package demo.cleaningservice.kafka;
 
+import demo.common.kafka.CleaningAssignedEvent;
+import demo.common.kafka.ReservationPaidEvent;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

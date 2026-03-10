@@ -1,7 +1,7 @@
 package demo.payment.controller;
 
-import demo.payment.model.PaymentRequestDto;
-import demo.payment.model.PaymentResponseDto;
+import demo.common.model.dto.PaymentRequestDto;
+import demo.common.model.dto.PaymentResponseDto;
 import demo.payment.service.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

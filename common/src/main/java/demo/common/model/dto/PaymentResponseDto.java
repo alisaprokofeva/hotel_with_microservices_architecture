@@ -1,7 +1,8 @@
 //общая папка
 
-package demo.reservation.external;
+package demo.common.model.dto;
 
+import demo.common.model.status.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 

@@ -1,4 +1,4 @@
-package demo.cleaningservice.domain;
+package demo.common.model.status;
 
 public enum CleaningStatus {
     DIRT,

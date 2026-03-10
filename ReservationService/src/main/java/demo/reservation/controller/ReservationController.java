@@ -1,6 +1,5 @@
 package demo.reservation.controller;
 
-import demo.reservation.external.PaymentRequestDto;
 import demo.reservation.mapper.ReservationMapper;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.validation.Valid;

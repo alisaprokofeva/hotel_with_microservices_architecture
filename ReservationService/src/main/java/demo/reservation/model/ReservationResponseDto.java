@@ -1,9 +1,8 @@
 package demo.reservation.model;
 
-import demo.reservation.model.status.PaymentStatus;
-import demo.reservation.model.status.CleaningStatus;
+import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.PaymentStatus;
 import demo.reservation.model.status.ReservationStatus;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

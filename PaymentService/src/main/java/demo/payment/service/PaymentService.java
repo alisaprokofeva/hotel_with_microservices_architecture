@@ -2,11 +2,11 @@
 
 package demo.payment.service;
 
+import demo.common.model.dto.PaymentRequestDto;
+import demo.common.model.dto.PaymentResponseDto;
+import demo.common.model.status.PaymentStatus;
 import demo.payment.repository.PaymentRepository;
 import demo.payment.mapper.PaymentMapper;
-import demo.payment.model.PaymentRequestDto;
-import demo.payment.model.PaymentResponseDto;
-import demo.payment.model.status.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

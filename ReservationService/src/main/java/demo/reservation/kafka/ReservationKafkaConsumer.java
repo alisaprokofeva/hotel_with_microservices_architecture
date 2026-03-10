@@ -1,5 +1,6 @@
 package demo.reservation.kafka;
 
+import demo.common.kafka.CleaningAssignedEvent;
 import demo.reservation.service.ReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.EnableKafka;

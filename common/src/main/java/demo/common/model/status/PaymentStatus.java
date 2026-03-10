@@ -1,6 +1,6 @@
 //общая папка
 
-package demo.reservation.external;
+package demo.common.model.status;
 
 public enum PaymentStatus {
     NOT_APPLICABLE,
