@@ -140,6 +140,7 @@ public class ReservationService {
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
+        reservationEntity =  repository.save(reservationEntity);
         //makePayment
         var request = new PaymentRequestDto(
                 id,
@@ -164,11 +165,15 @@ public class ReservationService {
                 .amount(reservationEntity.getAmount())
                 .build());
 
-        var status = response.paymentStatus().equals(PaymentStatus.PAID)
-                ? ReservationStatus.APPROVED
-                : ReservationStatus.PENDING;
-
+//        var status = response.paymentStatus().equals(PaymentStatus.PAID)
+//                ? ReservationStatus.APPROVED
+//                : ReservationStatus.PENDING;
+        //тест
+        var status = ReservationStatus.APPROVED;
         reservationEntity.setReservationStatus(status);
+        reservationEntity.setPaymentId(response.paymentId());
+//        reservationEntity.setPaymentStatus(response.paymentStatus());
+
         return repository.save(reservationEntity);
     }
 
