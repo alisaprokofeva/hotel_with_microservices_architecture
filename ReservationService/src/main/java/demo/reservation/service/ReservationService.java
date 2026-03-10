@@ -3,7 +3,6 @@ package demo.reservation.service;
 import demo.reservation.external.PaymentHttpClient;
 import demo.reservation.external.PaymentRequestDto;
 import demo.reservation.external.PaymentResponseDto;
-import demo.reservation.external.PaymentStatus as ExternalPaymentStatus;
 import demo.reservation.kafka.CleaningAssignedEvent;
 import demo.reservation.kafka.ReservationPaidEvent;
 import demo.reservation.model.status.CleaningStatus;
@@ -141,7 +140,9 @@ public class ReservationService {
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
-        //makePayment
+        // сохраняем статус перед оплатой, чтобы processPayment увидел PENDING_PAYMENT
+        reservationEntity = repository.save(reservationEntity);
+
         var request = new PaymentRequestDto(
                 id,
                 reservationEntity.getAmount()
@@ -165,15 +166,16 @@ public class ReservationService {
                 .amount(reservationEntity.getAmount())
                 .build());
 
-        var externalStatus = response.paymentStatus();
-        var reservationStatus = externalStatus == ExternalPaymentStatus.PAID
+        demo.reservation.external.PaymentStatus externalStatus = response.paymentStatus();
+
+        var reservationStatus = externalStatus == demo.reservation.external.PaymentStatus.PAID
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
 
         reservationEntity.setReservationStatus(reservationStatus);
         reservationEntity.setPaymentId(response.paymentId());
         reservationEntity.setPaymentStatus(
-                externalStatus == ExternalPaymentStatus.PAID
+                externalStatus == demo.reservation.external.PaymentStatus.PAID
                         ? PaymentStatus.PAID
                         : PaymentStatus.PAYMENT_FAILED
         );
