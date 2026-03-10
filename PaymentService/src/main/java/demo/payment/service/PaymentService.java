@@ -8,6 +8,8 @@ import demo.payment.model.PaymentRequestDto;
 import demo.payment.model.PaymentResponseDto;
 import demo.payment.model.status.PaymentStatus;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,12 +18,15 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    private final Logger log =  LoggerFactory.getLogger(PaymentService.class);
 
     public PaymentResponseDto makePayment(PaymentRequestDto requestDto) {
-        var found = paymentRepository.findByReservationId(requestDto.reservationId());
-        if (found.isPresent()) {
-            return paymentMapper.toResponseDto(found.get());
-        }
+        log.info("Called makePayment");
+//        var found = paymentRepository.findByReservationId(requestDto.reservationId());
+//        if (found.isPresent()) {
+//            log.info("Found payment for reservation id {}", found.get().getReservationId());
+//            return paymentMapper.toResponseDto(found.get());
+//        }
 
         var paymentEntity = paymentMapper.toEntity(requestDto);
 
@@ -29,9 +34,12 @@ public class PaymentService {
         PaymentStatus paymentStatus;
         if(requestDto.amount().intValue() % 2 == 0){
             paymentStatus = PaymentStatus.PAYMENT_FAILED;
+            log.info("Payment failed");
+
         }
         else{
             paymentStatus = PaymentStatus.PAID;
+            log.info("Payment successful");
         }
         paymentEntity.setPaymentStatus(paymentStatus);
 
