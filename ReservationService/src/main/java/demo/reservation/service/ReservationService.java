@@ -3,7 +3,6 @@ package demo.reservation.service;
 import demo.reservation.external.PaymentHttpClient;
 import demo.reservation.external.PaymentRequestDto;
 import demo.reservation.external.PaymentResponseDto;
-import demo.reservation.external.PaymentStatus as ExternalPaymentStatus;
 import demo.reservation.kafka.CleaningAssignedEvent;
 import demo.reservation.kafka.ReservationPaidEvent;
 import demo.reservation.model.status.CleaningStatus;
@@ -165,18 +164,11 @@ public class ReservationService {
                 .amount(reservationEntity.getAmount())
                 .build());
 
-        var externalStatus = response.paymentStatus();
-        var reservationStatus = externalStatus == ExternalPaymentStatus.PAID
+        var status = response.paymentStatus().equals(PaymentStatus.PAID)
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
 
-        reservationEntity.setReservationStatus(reservationStatus);
-        reservationEntity.setPaymentId(response.paymentId());
-        reservationEntity.setPaymentStatus(
-                externalStatus == ExternalPaymentStatus.PAID
-                        ? PaymentStatus.PAID
-                        : PaymentStatus.PAYMENT_FAILED
-        );
+        reservationEntity.setReservationStatus(status);
         return repository.save(reservationEntity);
     }
 
