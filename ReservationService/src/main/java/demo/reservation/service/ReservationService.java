@@ -1,7 +1,9 @@
 package demo.reservation.service;
 
 import demo.common.kafka.CleaningAssignedEvent;
+import demo.common.kafka.ReservationPaidEvent;
 import demo.common.model.dto.PaymentRequestDto;
+import demo.common.model.dto.PaymentResponseDto;
 import demo.common.model.status.CleaningStatus;
 import demo.common.model.status.PaymentStatus;
 import demo.reservation.external.PaymentHttpClient;
@@ -15,8 +17,10 @@ import demo.reservation.repository.ReservationRepository;
 import demo.reservation.model.status.ReservationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,12 +37,17 @@ public class ReservationService {
     private final ReservationMapper reservationMapper;
     private final ReservationAvailabilityService availabilityService;
     private final PaymentHttpClient paymentHttpClient;
+    private final KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate;
 
-    public ReservationService(ReservationRepository repository, ReservationMapper reservationMapper, ReservationAvailabilityService availabilityService, PaymentHttpClient paymentHttpClient){
+    @Value("${reservation-paid-topic}")
+    private String reservationPaidTopic;
+
+    public ReservationService(ReservationRepository repository, ReservationMapper reservationMapper, ReservationAvailabilityService availabilityService, PaymentHttpClient paymentHttpClient, KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate){
         this.repository = repository;
         this.reservationMapper = reservationMapper;
         this.availabilityService = availabilityService;
         this.paymentHttpClient = paymentHttpClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public ReservationResponseDto createReservation(ReservationRequestDto reservationToCreate) {
@@ -138,6 +147,7 @@ public class ReservationService {
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
         reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
+        //сохранять надо после проведедния оплаты а не до(или в processPayment он уже сохраняется?)
         reservationEntity =  repository.save(reservationEntity);
         //makePayment
         var request = new PaymentRequestDto(
@@ -146,6 +156,8 @@ public class ReservationService {
         );
         log.info("Approving reservation: id={}", id);
         var response = processPayment(id, request);
+        //после оплаты номер становится грязным
+
         log.info("Successfully approved reservation: id={}", id);
         return reservationMapper.toResponseDto(response);
     }
@@ -167,9 +179,10 @@ public class ReservationService {
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
         //тест
+        sendReservationPaidEvent(reservationEntity, response);
         reservationEntity.setReservationStatus(status);
         reservationEntity.setPaymentId(response.paymentId());
-//        reservationEntity.setPaymentStatus(response.paymentStatus());
+        reservationEntity.setPaymentStatus(response.paymentStatus());
 
         return repository.save(reservationEntity);
     }
@@ -179,7 +192,16 @@ public class ReservationService {
     //(основной id)
     //в моменте после прохода оплаты сервиса в основной бд в данном номере будет стоять что номер грязный
     //так
-    private void sendReservationPaidEvent(ReservationEntity reservationEntity ) {}
+    private void sendReservationPaidEvent(ReservationEntity reservationEntity, PaymentResponseDto response) {
+        kafkaTemplate.send(
+                reservationPaidTopic,
+                reservationEntity.getId(),
+                ReservationPaidEvent.builder()
+                        .reservationId(reservationEntity.getId())
+                        .roomId(reservationEntity.getRoomId())
+                        .build()
+        );
+    }
 
     public void processCleaningAssigned(CleaningAssignedEvent cleaningAssignedEvent) {
         var reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
