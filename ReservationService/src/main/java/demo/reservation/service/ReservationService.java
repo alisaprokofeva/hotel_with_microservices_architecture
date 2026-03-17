@@ -178,8 +178,12 @@ public class ReservationService {
         var status = response.paymentStatus().equals(PaymentStatus.PAID)
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
-        //тест
-        sendReservationPaidEvent(reservationEntity, response);
+        if(status.equals(ReservationStatus.APPROVED)){
+            sendReservationPaidEvent(reservationEntity, response);
+        }
+        else{
+            log.info("Can't clean room, payment failed: roomId={}", reservationEntity.getRoomId());
+        }
         reservationEntity.setReservationStatus(status);
         reservationEntity.setPaymentId(response.paymentId());
         reservationEntity.setPaymentStatus(response.paymentStatus());

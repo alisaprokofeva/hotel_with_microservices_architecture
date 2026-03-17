@@ -40,6 +40,7 @@ public class CleaningService {
         }
         var assignedCleaning = assignCleaning(reservationId, reservationPaidEvent.roomId());
         sendCleaningAssignedEvent(assignedCleaning);
+        log.info("Cleaning reservation {} is done", reservationId);
     }
 
 

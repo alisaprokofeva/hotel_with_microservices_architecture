@@ -14,7 +14,7 @@ spring:
       group-id: cleaning-service-group
     bootstrap-servers: localhost:9092
 server:
-  port: 8081
+  port: 8082
 
 reservation-paid-topic: reservations.events
 cleaning-assigned-topic: cleaning.events
