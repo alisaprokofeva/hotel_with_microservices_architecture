@@ -57,7 +57,6 @@ public class ReservationService {
 
         var entityToSave = reservationMapper.toEntity(reservationToCreate);
         entityToSave.setReservationStatus(ReservationStatus.PENDING);
-        entityToSave.setPaymentStatus(PaymentStatus.NOT_APPLICABLE);
 
         //временные заглушки (тк отсутствует список комнат+цен, и юзер сервис)
         entityToSave.setUserId(ThreadLocalRandom.current().nextLong(1, 100));
