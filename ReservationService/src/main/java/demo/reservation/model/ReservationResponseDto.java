@@ -1,6 +1,6 @@
 package demo.reservation.model;
 
-import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.RoomStatus;
 import demo.common.model.status.PaymentStatus;
 import demo.reservation.model.status.ReservationStatus;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -29,7 +29,7 @@ public record ReservationResponseDto(
         BigDecimal amount,
         ReservationStatus reservationStatus,
         PaymentStatus paymentStatus,
-        CleaningStatus cleaningStatus,
+        RoomStatus roomStatus,
         Long cleanerId
 ){
 }

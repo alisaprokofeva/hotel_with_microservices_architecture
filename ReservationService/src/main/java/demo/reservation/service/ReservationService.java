@@ -4,7 +4,7 @@ import demo.common.kafka.CleaningAssignedEvent;
 import demo.common.kafka.ReservationPaidEvent;
 import demo.common.model.dto.PaymentRequestDto;
 import demo.common.model.dto.PaymentResponseDto;
-import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.RoomStatus;
 import demo.common.model.status.PaymentStatus;
 import demo.reservation.external.PaymentHttpClient;
 import demo.reservation.model.ReservationResponseDto;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -207,11 +208,11 @@ public class ReservationService {
     }
 
     public void processCleaningAssigned(CleaningAssignedEvent cleaningAssignedEvent) {
-        var reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
+        ReservationEntity reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
         if(!reservation.getPaymentStatus().equals(PaymentStatus.PAID)){
             throw new IllegalStateException("Can't process cleaning assigned reservation");
         }
-        reservation.setCleaningStatus(CleaningStatus.CLEAR);
+        reservation.setRoomStatus(cleaningAssignedEvent.status());
         reservation.setCleanerId(cleaningAssignedEvent.cleanerId());
         repository.save(reservation);
     }
@@ -222,5 +223,15 @@ public class ReservationService {
         return reservationEntityOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
     }
+
+
+    //дописать это после мерджа с мейном
+//    @Scheduled(cron = "0 0 12 * * *", zone = "Europe/Moscow")
+//    public void updateRoomStatus(){
+//        List<ReservationEntity> rooms = repository.findAllByRoomStatus(RoomStatus.CLEAR);
+//        for(ReservationEntity room : rooms){
+//
+//        }
+//    }
 
 }

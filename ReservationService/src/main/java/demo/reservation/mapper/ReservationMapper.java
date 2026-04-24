@@ -18,7 +18,7 @@ public class ReservationMapper {
                 reservationEntity.getAmount(),
                 reservationEntity.getReservationStatus(),
                 reservationEntity.getPaymentStatus(),
-                reservationEntity.getCleaningStatus(),
+                reservationEntity.getRoomStatus(),
                 reservationEntity.getCleanerId()
         );
     }

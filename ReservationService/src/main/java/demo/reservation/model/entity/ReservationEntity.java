@@ -1,6 +1,6 @@
 package demo.reservation.model.entity;
 
-import demo.common.model.status.CleaningStatus;
+import demo.common.model.status.RoomStatus;
 import demo.common.model.status.PaymentStatus;
 import jakarta.persistence.*;
 import demo.reservation.model.status.ReservationStatus;
@@ -44,8 +44,8 @@ public class ReservationEntity {
     @Column(name="payment_status")
     private PaymentStatus paymentStatus;
     @Enumerated(EnumType.STRING)
-    @Column(name="cleaning_status")
-    private CleaningStatus cleaningStatus;
+    @Column(name="room_status")
+    private RoomStatus roomStatus;
     @Column(name = "cleaner_id")
     private Long cleanerId;
 

@@ -1,6 +1,6 @@
 package demo.common.model.status;
 
-public enum CleaningStatus {
+public enum RoomStatus {
     DIRT,
     CLEAR
 }

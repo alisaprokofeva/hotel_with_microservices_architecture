@@ -1,5 +1,6 @@
 package demo.reservation.repository;
 
+import demo.common.model.status.RoomStatus;
 import demo.reservation.model.entity.ReservationEntity;
 import demo.reservation.model.status.ReservationStatus;
 import org.springframework.data.domain.Pageable;
@@ -68,4 +69,6 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
             @Param ("userId") Long userId,
             Pageable pageable
     );
+
+    List<ReservationEntity> findAllByRoomStatus(RoomStatus roomStatus);
 }
