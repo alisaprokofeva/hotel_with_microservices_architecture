@@ -17,6 +17,7 @@ public class ReservationMapper {
                 .reservationStatus(entity.getReservationStatus())
                 .paymentStatus(entity.getPaymentStatus())
                 .roomStatus(entity.getRoomStatus())
+                .etaMinutes(entity.getEtaMinutes())
                 .build();
     }
     public ReservationEntity toEntity(ReservationRequestDto reservationRequestDto) {

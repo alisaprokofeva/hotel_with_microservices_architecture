@@ -20,6 +20,7 @@ public record ReservationResponseDto(
         BigDecimal amount,
         ReservationStatus reservationStatus,
         PaymentStatus paymentStatus,
-        RoomStatus roomStatus
+        RoomStatus roomStatus,
+        Long etaMinutes
 ){
 }

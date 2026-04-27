@@ -19,10 +19,10 @@ public class CleaningEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "reservationId")
+    @Column(name = "reservation_id")
     private Long reservationId;
 
-    @Column(name = "roomId")
+    @Column(name = "room_id")
     private Long roomId;
 
     @Enumerated(EnumType.STRING)

@@ -40,11 +40,6 @@ public class CleaningService {
     public void processCleaning(ReservationPaidEvent reservationPaidEvent) {
         log.info("Called CleaningService, service is trying to clean the room by num: {}", reservationPaidEvent.roomId());
         var reservationId = reservationPaidEvent.reservationId();
-        var found = cleaningEntityRepository.findById(reservationId);
-        if (found.isPresent()) {
-            log.info("Cleaning reservation {} found", reservationId);
-            return;
-        }
         var assignedCleaning = assignCleaning(reservationId, reservationPaidEvent.roomId());
         sendCleaningAssignedEvent(assignedCleaning);
         log.info("Cleaning reservation {} is done", reservationId);

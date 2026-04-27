@@ -46,7 +46,7 @@ public class ReservationService {
     private String reservationPaidTopic;
 
     @Value("${cleaning-assigned-topic}")
-    private RoomStatus cleaningAssignedTopic;
+    private String cleaningAssignedTopic;
 
     public ReservationService(
             ReservationRepository repository,
@@ -241,11 +241,12 @@ public class ReservationService {
         log.info("Sending payment request to external service for reservation {}", id);
         var response = paymentHttpClient.createPayment(request);
 
-        var status = (response.paymentStatus() == PaymentStatus.PAID)
+        var status = (response.paymentStatus().equals(PaymentStatus.PAID))
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
 
-        if(status == ReservationStatus.APPROVED){
+        if(status.equals(ReservationStatus.APPROVED)){
+            System.out.println("Called CleaningService");
             sendReservationPaidEvent(reservationEntity, response);
         }
         else{

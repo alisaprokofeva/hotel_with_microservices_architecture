@@ -26,7 +26,7 @@ public class PaymentService {
 
         //заглушка
         PaymentStatus paymentStatus;
-        if(requestDto.amount().intValue() % 2 == 0){
+        if(requestDto.amount().intValue() % 123 == 0){
             paymentStatus = PaymentStatus.PAYMENT_FAILED;
             log.info("Payment failed");
         }

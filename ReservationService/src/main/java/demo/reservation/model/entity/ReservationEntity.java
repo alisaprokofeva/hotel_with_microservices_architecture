@@ -49,6 +49,6 @@ public class ReservationEntity {
     @Column(name = "cleaner_id")
     private Long cleanerId;
     @Column(name = "eta_minutes")
-    private long etaMinutes;
+    private Long etaMinutes;
 
 }
