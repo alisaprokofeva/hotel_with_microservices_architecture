@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CleaningService/CleaningService.iml" filepath="$PROJECT_DIR$/CleaningService/CleaningService.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ReservationService/demo.iml" filepath="$PROJECT_DIR$/ReservationService/demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotel-parent.iml" filepath="$PROJECT_DIR$/hotel-parent.iml" />
     </modules>
   </component>
 </project>
