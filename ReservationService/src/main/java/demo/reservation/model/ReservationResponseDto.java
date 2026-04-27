@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Builder
 public record ReservationResponseDto(
         Long id,
+        Long userId,
         Long roomId,
         LocalDate startDate,
         LocalDate endDate,

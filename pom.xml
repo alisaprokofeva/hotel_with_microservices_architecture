@@ -14,6 +14,8 @@
 
     <modules>
         <module>common</module>
+        <module>UserService</module>
+        <module>ReservationService</module>
         <module>PaymentService</module>
         <module>CleaningService</module>
     </modules>

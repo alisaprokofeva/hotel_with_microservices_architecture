@@ -17,6 +17,11 @@
           <package value="demo.payment" />
         </packages>
       </persistence-unit>
+      <persistence-unit moduleName="user-service" name="Default">
+        <packages>
+          <package value="demo.reservation" />
+        </packages>
+      </persistence-unit>
     </persistence-units>
   </component>
 </project>

@@ -12,17 +12,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>user-service</artifactId> <!-- Имя твоего сервиса -->
+    <artifactId>user-service</artifactId>
     <name>UserService</name>
 
     <dependencies>
-        <!-- Web: Контроллеры и REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- БД: Репозитории и Сущности -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -33,35 +31,53 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Kafka: Сообщения между сервисами -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-kafka</artifactId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- Валидация: @NotNull и прочее -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Твой общий модуль (версия придет из parent) -->
         <dependency>
             <groupId>demo</groupId>
             <artifactId>common</artifactId>
         </dependency>
 
-        <!-- Тесты (включает всё: Mockito, JUnit, AssertJ) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Обязателен здесь, чтобы собрать запускаемый JAR -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

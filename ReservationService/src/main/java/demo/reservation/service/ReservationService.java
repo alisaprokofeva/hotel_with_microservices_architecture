@@ -7,6 +7,7 @@ import demo.common.model.dto.PaymentResponseDto;
 import demo.common.model.status.PaymentStatus;
 import demo.common.model.status.RoomStatus;
 import demo.reservation.external.PaymentHttpClient;
+import demo.reservation.external.UserHttpClient;
 import demo.reservation.model.ReservationResponseDto;
 import demo.reservation.model.entity.RoomEntity;
 import demo.reservation.repository.RoomRepository;
@@ -25,11 +26,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class ReservationService {
@@ -40,6 +42,7 @@ public class ReservationService {
     private final ReservationMapper reservationMapper;
     private final ReservationAvailabilityService availabilityService;
     private final PaymentHttpClient paymentHttpClient;
+    private final UserHttpClient userHttpClient;
     private final KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate;
 
     @Value("${reservation-paid-topic}")
@@ -53,6 +56,7 @@ public class ReservationService {
             ReservationMapper reservationMapper,
             ReservationAvailabilityService availabilityService,
             PaymentHttpClient paymentHttpClient,
+            UserHttpClient userHttpClient,
             KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate,
             RoomRepository roomRepository
     ){
@@ -60,12 +64,16 @@ public class ReservationService {
         this.reservationMapper = reservationMapper;
         this.availabilityService = availabilityService;
         this.paymentHttpClient = paymentHttpClient;
+        this.userHttpClient = userHttpClient;
         this.kafkaTemplate = kafkaTemplate;
         this.roomRepository = roomRepository;
     }
 
 
-    public ReservationResponseDto createReservation(ReservationRequestDto reservationToCreate) {
+    public ReservationResponseDto createReservation(
+            ReservationRequestDto reservationToCreate,
+            String authorizationHeader
+    ) {
 
         validateDates(reservationToCreate.startDate(), reservationToCreate.endDate());
 
@@ -75,16 +83,37 @@ public class ReservationService {
                 ));
 
         var entityToSave = reservationMapper.toEntity(reservationToCreate);
+        entityToSave.setUserId(resolveCurrentUserId(authorizationHeader));
 
         entityToSave.setReservationStatus(ReservationStatus.PENDING);
         entityToSave.setRoom(room);
         entityToSave.setAmount(calculateTotalAmount(room, reservationToCreate.startDate(), reservationToCreate.endDate()));
 
-        //временные заглушки (тк отсутствует юзер сервис)
-        entityToSave.setUserId(ThreadLocalRandom.current().nextLong(1, 100));
-
         var savedEntity = repository.save(entityToSave);
         return reservationMapper.toResponseDto(savedEntity);
+    }
+
+    private Long resolveCurrentUserId(String authorizationHeader) {
+        if (authorizationHeader == null || authorizationHeader.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization header is required");
+        }
+        if (!authorizationHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization header must use Bearer token");
+        }
+
+        try {
+            var currentUser = userHttpClient.getCurrentUser(authorizationHeader);
+            if (currentUser == null || currentUser.id() == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cannot resolve user from token");
+            }
+            return currentUser.id();
+        } catch (HttpClientErrorException.Unauthorized ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+        } catch (HttpClientErrorException.Forbidden ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied for current user");
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "User service is unavailable");
+        }
     }
 
 
@@ -115,23 +144,26 @@ public class ReservationService {
         }
     }
 
-    public ReservationResponseDto getReservationById(Long id) {
+    public ReservationResponseDto getReservationById(Long id, String authorizationHeader) {
         ReservationEntity reservationEntity = repository.findById(id).orElseThrow(()->
                 new EntityNotFoundException
                         ("Not found reservation by id "+id));
+        ensureOwnerAccess(reservationEntity, authorizationHeader);
 
         return reservationMapper.toResponseDto(reservationEntity);
     };
 
     public List<ReservationResponseDto> searchAllByFilter(
-            SearchByFilterDto filter
+            SearchByFilterDto filter,
+            String authorizationHeader
     ) {
+        Long currentUserId = resolveCurrentUserId(authorizationHeader);
         int pageSize = filter.pageSize() != null ? filter.pageSize():10;
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber():0;
         var pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
         List<ReservationEntity> allEntities = repository.searchAllByFilter(
                 filter.roomId(),
-                filter.userId(),
+                currentUserId,
                 pageable
         );
 
@@ -140,11 +172,13 @@ public class ReservationService {
 
     public ReservationResponseDto updateReservation(
             Long id,
-            ReservationRequestDto reservationToUpdate
+            ReservationRequestDto reservationToUpdate,
+            String authorizationHeader
     ) {
 
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
+        ensureOwnerAccess(reservationEntity, authorizationHeader);
 
         ensureCanBeApproved(reservationEntity);
         validateDates(reservationToUpdate.startDate(), reservationToUpdate.endDate());
@@ -168,9 +202,10 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancelReservation(Long id) {
+    public void cancelReservation(Long id, String authorizationHeader) {
         var reservation = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found reservation by id: "+id));
+        ensureOwnerAccess(reservation, authorizationHeader);
 
         if(reservation.getReservationStatus() == ReservationStatus.APPROVED){
             throw new IllegalStateException("Can't cancel approved reservation. Contact" +
@@ -184,10 +219,11 @@ public class ReservationService {
         log.info("Successfully cancelled reservation: id={}", id);
     }
 
-    public ReservationResponseDto approveReservation(Long id) {
+    public ReservationResponseDto approveReservation(Long id, String authorizationHeader) {
 
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
+        ensureOwnerAccess(reservationEntity, authorizationHeader);
 
         ensureCanBeApproved(reservationEntity);
         checkRoomAvailability(reservationEntity);
@@ -227,6 +263,13 @@ public class ReservationService {
         if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
             throw new IllegalStateException
                     ("Can't approve reservation = "+reservationEntity.getReservationStatus());
+        }
+    }
+
+    private void ensureOwnerAccess(ReservationEntity reservationEntity, String authorizationHeader) {
+        Long currentUserId = resolveCurrentUserId(authorizationHeader);
+        if (!currentUserId.equals(reservationEntity.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only modify your own reservation");
         }
     }
 

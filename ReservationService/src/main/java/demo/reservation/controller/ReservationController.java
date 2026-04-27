@@ -1,6 +1,5 @@
 package demo.reservation.controller;
 
-import demo.reservation.mapper.ReservationMapper;
 import demo.reservation.model.ReservationResponseDto;
 import jakarta.validation.Valid;
 import demo.reservation.model.ReservationRequestDto;
@@ -24,68 +23,70 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    private final ReservationMapper reservationMapper;
-
     @GetMapping("/{id}")
     //без RequestMapping надо было бы писать /reservation/{id}
     public ResponseEntity<ReservationResponseDto> getReservationById(
-            @PathVariable("id") Long id
+            @PathVariable("id") Long id,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: getReservationById: id = "+id);
-        return ResponseEntity.ok(reservationService.getReservationById(id));
+        return ResponseEntity.ok(reservationService.getReservationById(id, authorizationHeader));
 
     }
 
     @GetMapping()
     public ResponseEntity<List<ReservationResponseDto>> getAllReservations(
             @RequestParam (name = "roomId", required = false) Long roomId,
-            @RequestParam (name = "userId", required = false) Long userId,
             @RequestParam (name = "pageSize", required = false) Integer pageSize,
-            @RequestParam (name = "pageNumber", required = false) Integer pageNumber
+            @RequestParam (name = "pageNumber", required = false) Integer pageNumber,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: getAllReservations");
         var filter = new SearchByFilterDto(
                 roomId,
-                userId,
                 pageSize,
                 pageNumber
         );
-        return ResponseEntity.ok(reservationService.searchAllByFilter(filter));
+        return ResponseEntity.ok(reservationService.searchAllByFilter(filter, authorizationHeader));
     }
 
     @PostMapping()
     public ResponseEntity<ReservationResponseDto> createReservation(
-            @RequestBody @Valid ReservationRequestDto reservationToCreate
+            @RequestBody @Valid ReservationRequestDto reservationToCreate,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: createReservation");
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(reservationService.createReservation(reservationToCreate));
+                .body(reservationService.createReservation(reservationToCreate, authorizationHeader));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
             @PathVariable("id") Long id,
-            @RequestBody @Valid ReservationRequestDto reservationToUpdate
+            @RequestBody @Valid ReservationRequestDto reservationToUpdate,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: updateReservation");
-        return ResponseEntity.ok(reservationService.updateReservation(id, reservationToUpdate));
+        return ResponseEntity.ok(reservationService.updateReservation(id, reservationToUpdate, authorizationHeader));
     }
 
     @DeleteMapping("/{id}/cancel")
     public ResponseEntity<Void> deleteReservation(
-            @PathVariable("id") Long id
+            @PathVariable("id") Long id,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: cancelReservation");
-        reservationService.cancelReservation(id);
+        reservationService.cancelReservation(id, authorizationHeader);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<ReservationResponseDto> approveReservation(
-            @PathVariable("id") Long id
+            @PathVariable("id") Long id,
+            @RequestHeader("Authorization") String authorizationHeader
     ){
         log.info("Called: approveReservation");
-        var reservation = reservationService.approveReservation(id);
+        var reservation = reservationService.approveReservation(id, authorizationHeader);
         return ResponseEntity.ok(reservation);
     }
 

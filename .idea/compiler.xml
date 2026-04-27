@@ -8,26 +8,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
       </profile>
-      <profile name="Annotation profile for ReservationService" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-        </processorPath>
-        <module name="demo" />
-      </profile>
       <profile name="Annotation profile for hotel-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="common" />
-        <module name="CleaningService" />
         <module name="payment" />
+        <module name="user-service" />
+        <module name="CleaningService" />
+        <module name="common" />
+        <module name="demo" />
       </profile>
     </annotationProcessing>
   </component>
@@ -38,6 +30,7 @@
       <module name="demo" options="-parameters" />
       <module name="hotel-parent" options="-parameters" />
       <module name="payment" options="-parameters" />
+      <module name="user-service" options="-parameters" />
     </option>
   </component>
 </project>

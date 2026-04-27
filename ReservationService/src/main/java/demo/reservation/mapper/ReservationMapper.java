@@ -10,6 +10,7 @@ public class ReservationMapper {
     public ReservationResponseDto toResponseDto(ReservationEntity entity) {
         return ReservationResponseDto.builder()
                 .id(entity.getId())
+                .userId(entity.getUserId())
                 .roomId(entity.getRoom() != null ? entity.getRoom().getId() : null)
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())

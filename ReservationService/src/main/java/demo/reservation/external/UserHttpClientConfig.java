@@ -8,23 +8,23 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
-public class PaymentHttpClientConfig {
+public class UserHttpClientConfig {
 
-    @Value("${payment-service.base-url:http://localhost:8081}")
-    private String paymentServiceBaseUrl;
+    @Value("${user-service.base-url:http://localhost:8083}")
+    private String userServiceBaseUrl;
 
     @Bean
-    RestClient paymentRestClient() {
+    RestClient userRestClient() {
         return RestClient.builder()
-                .baseUrl(paymentServiceBaseUrl)
+                .baseUrl(userServiceBaseUrl)
                 .build();
     }
 
     @Bean
-    PaymentHttpClient paymentHttpClient(RestClient paymentRestClient) {
+    UserHttpClient userHttpClient(RestClient userRestClient) {
         return HttpServiceProxyFactory.builder()
-                .exchangeAdapter(RestClientAdapter.create(paymentRestClient))
-                .build().createClient(PaymentHttpClient.class);
+                .exchangeAdapter(RestClientAdapter.create(userRestClient))
+                .build()
+                .createClient(UserHttpClient.class);
     }
-
 }
