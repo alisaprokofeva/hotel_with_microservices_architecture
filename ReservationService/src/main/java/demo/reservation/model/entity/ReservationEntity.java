@@ -48,5 +48,7 @@ public class ReservationEntity {
     private RoomStatus roomStatus;
     @Column(name = "cleaner_id")
     private Long cleanerId;
+    @Column(name = "eta_minutes")
+    private long etaMinutes;
 
 }

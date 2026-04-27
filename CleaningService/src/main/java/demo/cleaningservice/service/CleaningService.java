@@ -61,6 +61,7 @@ public class CleaningService {
                         .roomId(assignedCleaning.getRoomId())
                         .cleanerId(assignedCleaning.getId())
                         .status(assignedCleaning.getRoomStatus())
+                        .etaMinutes(assignedCleaning.getEtaMinutes())
                         .build()
         );
     }

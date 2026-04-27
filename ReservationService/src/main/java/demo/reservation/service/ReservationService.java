@@ -212,8 +212,10 @@ public class ReservationService {
         if(!reservation.getPaymentStatus().equals(PaymentStatus.PAID)){
             throw new IllegalStateException("Can't process cleaning assigned reservation");
         }
+        //eta
         reservation.setRoomStatus(cleaningAssignedEvent.status());
         reservation.setCleanerId(cleaningAssignedEvent.cleanerId());
+        reservation.setEtaMinutes(cleaningAssignedEvent.etaMinutes());
         repository.save(reservation);
     }
 

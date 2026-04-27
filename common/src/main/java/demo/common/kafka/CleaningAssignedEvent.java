@@ -10,6 +10,7 @@ public record CleaningAssignedEvent (
         Long reservationId,
         Long roomId,
         Long cleanerId,
-        RoomStatus status
+        RoomStatus status,
+        Long etaMinutes
 ){
 }
