@@ -1,7 +1,7 @@
 package demo.cleaningservice.kafka;
 
 
-import demo.cleaningservice.domain.CleaningService;
+import demo.cleaningservice.service.CleaningService;
 import demo.common.kafka.ReservationPaidEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
