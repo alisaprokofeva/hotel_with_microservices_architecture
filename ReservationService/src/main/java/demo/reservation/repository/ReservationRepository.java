@@ -13,33 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Long> {
-    //автоматически будет работать(запрос писать не надо)
-    //List<ReservationEntity> findAllByStatusIs(ReservationStatus status);
-    //или то же самое
-//    @Query("select r from ReservationEntity r where r.status = :status")
-//    List<ReservationEntity> findAllByStatusIs(ReservationStatus status);
-    //можно то же самое на голом SQL (без JPQL)
-    //@Query(value = "select * from reservations r where r.status = :status", nativeQuery = true)
-    //List<ReservationEntity> findAllByStatusIs(ReservationStatus status);
-
-
-//    @Query("select r from ReservationEntity r where r.roomId= :roomId")
-//    List<ReservationEntity> findAllByRoomId(@Param("roomId") Long roomId);
-//
-//    @Transactional
-//    @Modifying
-//    @Query("update ReservationEntity r " +
-//            "set r.userId= :userId, r.roomId= :roomId, r.startDate= :startDate r.endDate= :endDate," +
-//            " r.status= :status where r.id= :id")
-//    int updateAllFields(
-//            @Param("id") Long id,
-//            @Param("userId") Long userId,
-//            @Param("roomId") Long roomId,
-//            @Param("startDate")LocalDate startDate,
-//            @Param("endDate")LocalDate endDate,
-//            @Param("status") ReservationStatus status
-//            );
-
 
     @Modifying
     @Query("update ReservationEntity r " +
@@ -50,19 +23,19 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
     );
 
     @Query("SELECT r.id from ReservationEntity r " +
-            "WHERE r.roomId = :roomId " +
+            "WHERE r.room.id = :roomId " +
+            "AND r.reservationStatus = :status " + // Проверяем только один статус
             "AND :startDate < r.endDate " +
-            "AND r.startDate < :endDate " +
-            "AND r.reservationStatus = :reservationStatus")
+            "AND r.startDate < :endDate")
     List<Long> findConflictReservationIds(
-            @Param ("roomId") Long roomId,
-            @Param ("startDate")LocalDate startDate,
-            @Param ("endDate")LocalDate endDate,
-            @Param ("reservationStatus") ReservationStatus reservationStatus
+            @Param("roomId") Long roomId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("status") ReservationStatus status
     );
 
     @Query("SELECT r from ReservationEntity r " +
-            "WHERE (:roomId IS NULL OR r.roomId= :roomId) " +
+            "WHERE (:roomId IS NULL OR r.room.id = :roomId) " +
             "AND (:userId IS NULL OR r.userId = :userId)")
     List<ReservationEntity> searchAllByFilter(
             @Param ("roomId") Long roomId,
