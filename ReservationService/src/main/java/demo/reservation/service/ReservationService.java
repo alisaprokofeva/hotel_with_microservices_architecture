@@ -8,6 +8,8 @@ import demo.common.model.status.CleaningStatus;
 import demo.common.model.status.PaymentStatus;
 import demo.reservation.external.PaymentHttpClient;
 import demo.reservation.model.ReservationResponseDto;
+import demo.reservation.model.entity.RoomEntity;
+import demo.reservation.repository.RoomRepository;
 import jakarta.persistence.EntityNotFoundException;
 import demo.reservation.model.ReservationRequestDto;
 import demo.reservation.model.entity.ReservationEntity;
@@ -24,8 +26,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,6 +36,7 @@ public class ReservationService {
 
     private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
     private final ReservationRepository repository;
+    private final RoomRepository roomRepository;
     private final ReservationMapper reservationMapper;
     private final ReservationAvailabilityService availabilityService;
     private final PaymentHttpClient paymentHttpClient;
@@ -42,28 +45,71 @@ public class ReservationService {
     @Value("${reservation-paid-topic}")
     private String reservationPaidTopic;
 
-    public ReservationService(ReservationRepository repository, ReservationMapper reservationMapper, ReservationAvailabilityService availabilityService, PaymentHttpClient paymentHttpClient, KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate){
+    public ReservationService(
+            ReservationRepository repository,
+            ReservationMapper reservationMapper,
+            ReservationAvailabilityService availabilityService,
+            PaymentHttpClient paymentHttpClient,
+            KafkaTemplate<Long, ReservationPaidEvent> kafkaTemplate,
+            RoomRepository roomRepository
+    ){
         this.repository = repository;
         this.reservationMapper = reservationMapper;
         this.availabilityService = availabilityService;
         this.paymentHttpClient = paymentHttpClient;
         this.kafkaTemplate = kafkaTemplate;
+        this.roomRepository = roomRepository;
     }
 
+
     public ReservationResponseDto createReservation(ReservationRequestDto reservationToCreate) {
-        if(!reservationToCreate.endDate().isAfter(reservationToCreate.startDate())){
-            throw new IllegalArgumentException("Start date must be one day earlier than end date");
-        }
+
+        validateDates(reservationToCreate.startDate(), reservationToCreate.endDate());
+
+        var room = roomRepository.findById(reservationToCreate.roomId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Room with id " + reservationToCreate.roomId() + " not found"
+                ));
 
         var entityToSave = reservationMapper.toEntity(reservationToCreate);
-        entityToSave.setReservationStatus(ReservationStatus.PENDING);
 
-        //временные заглушки (тк отсутствует список комнат+цен, и юзер сервис)
+        entityToSave.setReservationStatus(ReservationStatus.PENDING);
+        entityToSave.setRoom(room);
+        entityToSave.setAmount(calculateTotalAmount(room, reservationToCreate.startDate(), reservationToCreate.endDate()));
+
+        //временные заглушки (тк отсутствует юзер сервис)
         entityToSave.setUserId(ThreadLocalRandom.current().nextLong(1, 100));
-        entityToSave.setAmount(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(3000, 10000)));
 
         var savedEntity = repository.save(entityToSave);
         return reservationMapper.toResponseDto(savedEntity);
+    }
+
+
+    private BigDecimal calculateTotalAmount(
+            RoomEntity room,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        long nights = java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate);
+        return room.getPrice().multiply(BigDecimal.valueOf(nights));
+    }
+
+
+    private void validateDates(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Dates cannot be null");
+        }
+
+        if (!endDate.isAfter(startDate)) {
+            throw new IllegalArgumentException("Start date must be earlier than end date");
+        }
+
+        if (startDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Reservation cannot be in the past");
+        }
     }
 
     public ReservationResponseDto getReservationById(Long id) {
@@ -74,11 +120,10 @@ public class ReservationService {
         return reservationMapper.toResponseDto(reservationEntity);
     };
 
-
     public List<ReservationResponseDto> searchAllByFilter(
             SearchByFilterDto filter
     ) {
-        int pageSize = filter.pageSize() != null ? filter.pageSize():10; //лучше вынести в applicationProperties
+        int pageSize = filter.pageSize() != null ? filter.pageSize():10;
         int pageNumber = filter.pageNumber() != null ? filter.pageNumber():0;
         var pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
         List<ReservationEntity> allEntities = repository.searchAllByFilter(
@@ -90,40 +135,45 @@ public class ReservationService {
         return allEntities.stream().map(reservationMapper::toResponseDto).toList();
     }
 
-    public ReservationResponseDto updateReservation
-            (Long id,
-             ReservationRequestDto reservationToUpdate
+    public ReservationResponseDto updateReservation(
+            Long id,
+            ReservationRequestDto reservationToUpdate
     ) {
+
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
 
-        if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
-            throw new IllegalStateException("Can't modify reservation: status = "+reservationEntity.getReservationStatus());
-        }
-        if(!reservationToUpdate.endDate().isAfter(reservationToUpdate.startDate())){
-            throw new IllegalArgumentException("Start date must be one day earlier than end date");
+        ensureCanBeApproved(reservationEntity);
+        validateDates(reservationToUpdate.startDate(), reservationToUpdate.endDate());
+
+        if (!reservationEntity.getRoom().getId().equals(reservationToUpdate.roomId())) {
+            var newRoom = roomRepository.findById(reservationToUpdate.roomId())
+                    .orElseThrow(() -> new EntityNotFoundException("Room not found"));
+            reservationEntity.setRoom(newRoom);
         }
 
-        var reservationToSave = reservationMapper.toEntity((reservationToUpdate));
-        reservationToSave.setReservationStatus(ReservationStatus.PENDING);
-        reservationToSave.setId(reservationEntity.getId());
-        reservationToSave.setUserId(reservationEntity.getUserId());
-        reservationToSave.setAmount(reservationEntity.getAmount());
-        reservationToSave.setPaymentId(reservationEntity.getPaymentId());
-        //тут может все лечь из-за пустых полей с клинером и статусом
-        var updateReservation = repository.save(reservationToSave);
-        return reservationMapper.toResponseDto(updateReservation);
+        reservationEntity.setStartDate(reservationToUpdate.startDate());
+        reservationEntity.setEndDate(reservationToUpdate.endDate());
+        reservationEntity.setAmount(calculateTotalAmount(
+                reservationEntity.getRoom(),
+                reservationToUpdate.startDate(),
+                reservationToUpdate.endDate()));
+
+        checkRoomAvailability(reservationEntity);
+        var updated = repository.save(reservationEntity);
+        return reservationMapper.toResponseDto(updated);
     }
 
     @Transactional
     public void cancelReservation(Long id) {
         var reservation = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found reservation by id: "+id));
-        if(reservation.getReservationStatus().equals(ReservationStatus.APPROVED)){
+
+        if(reservation.getReservationStatus() == ReservationStatus.APPROVED){
             throw new IllegalStateException("Can't cancel approved reservation. Contact" +
                     " with manager");
         }
-        if(reservation.getReservationStatus().equals(ReservationStatus.CANCELLED)){
+        if(reservation.getReservationStatus() == ReservationStatus.CANCELLED){
             throw new IllegalArgumentException("Can't cancel the reservation." +
                     " Reservation was already cancelled");
         }
@@ -136,91 +186,108 @@ public class ReservationService {
         var reservationEntity = repository.findById(id).orElseThrow(()-> new EntityNotFoundException
                 ("Not found reservation by id"+id));
 
-        if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
-            throw new IllegalStateException("Can't approve reservation = "+reservationEntity.getReservationStatus());
-        }
-        var isAvailableToApprove = availabilityService.isReservationAvailable(reservationEntity.getRoomId(),
+        ensureCanBeApproved(reservationEntity);
+        checkRoomAvailability(reservationEntity);
+        prepareForPayment(reservationEntity);
+
+        log.info("Approving reservation: id={}", id);
+        var request = createPaymentRequest(reservationEntity);
+        var updatedEntity = processPayment(id, request);
+        log.info("Successfully approved reservation: id={}", id);
+        return reservationMapper.toResponseDto(updatedEntity);
+    }
+
+    private PaymentRequestDto createPaymentRequest(ReservationEntity reservationEntity) {
+        return new PaymentRequestDto(
+                reservationEntity.getId(),
+                reservationEntity.getAmount()
+        );
+    }
+
+    private void prepareForPayment(ReservationEntity reservationEntity) {
+        reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
+        repository.save(reservationEntity);
+    }
+
+    private void checkRoomAvailability(ReservationEntity reservationEntity) {
+        var isAvailableToApprove = availabilityService.isReservationAvailable(
+                reservationEntity.getRoom().getId(),
                 reservationEntity.getStartDate(),
                 reservationEntity.getEndDate());
+
         if(!isAvailableToApprove){
             throw new IllegalArgumentException("Can't approve reservation because of conflict");
         }
-        reservationEntity.setPaymentStatus(PaymentStatus.PENDING_PAYMENT);
-        //сохранять надо после проведедния оплаты а не до(или в processPayment он уже сохраняется?)
-        reservationEntity =  repository.save(reservationEntity);
-        //makePayment
-        var request = new PaymentRequestDto(
-                id,
-                reservationEntity.getAmount()
-        );
-        log.info("Approving reservation: id={}", id);
-        var response = processPayment(id, request);
-        //после оплаты номер становится грязным
-
-        log.info("Successfully approved reservation: id={}", id);
-        return reservationMapper.toResponseDto(response);
     }
 
-    public ReservationEntity processPayment(Long id, PaymentRequestDto request) {
-        var reservationEntity = getReservationOrThrow(id);
+    private void ensureCanBeApproved(ReservationEntity reservationEntity) {
+        if(reservationEntity.getReservationStatus() != ReservationStatus.PENDING){
+            throw new IllegalStateException
+                    ("Can't approve reservation = "+reservationEntity.getReservationStatus());
+        }
+    }
 
-        //??
-        if(!reservationEntity.getPaymentStatus().equals(PaymentStatus.PENDING_PAYMENT)) {
+    public ReservationEntity processPayment(
+            Long id,
+            PaymentRequestDto request
+    ) {
+        var reservationEntity = getReservationOrThrow(id);
+        if (reservationEntity.getPaymentStatus() != PaymentStatus.PENDING_PAYMENT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment status is not PENDING");
         }
+        log.info("Sending payment request to external service for reservation {}", id);
+        var response = paymentHttpClient.createPayment(request);
 
-        var response = paymentHttpClient.createPayment(PaymentRequestDto.builder()
-                .reservationId(reservationEntity.getId())
-                .amount(reservationEntity.getAmount())
-                .build());
-
-        var status = response.paymentStatus().equals(PaymentStatus.PAID)
+        var status = (response.paymentStatus() == PaymentStatus.PAID)
                 ? ReservationStatus.APPROVED
                 : ReservationStatus.PENDING;
-        if(status.equals(ReservationStatus.APPROVED)){
+
+        if(status == ReservationStatus.APPROVED){
             sendReservationPaidEvent(reservationEntity, response);
         }
         else{
-            log.info("Can't clean room, payment failed: roomId={}", reservationEntity.getRoomId());
+            log.info("Payment failed or rejected for room {}: reservationId={}",
+                    reservationEntity.getRoom().getId(), id);
         }
+
         reservationEntity.setReservationStatus(status);
         reservationEntity.setPaymentId(response.paymentId());
         reservationEntity.setPaymentStatus(response.paymentStatus());
-
+        log.info("Payment processed for reservation {}. New status: {}", id, status);
         return repository.save(reservationEntity);
     }
 
-
-    //метод для paymentService, в параметрах также должен быть респонс с номером комнаты и номером бронирования
-    //(основной id)
-    //в моменте после прохода оплаты сервиса в основной бд в данном номере будет стоять что номер грязный
-    //так
-    private void sendReservationPaidEvent(ReservationEntity reservationEntity, PaymentResponseDto response) {
+    private void sendReservationPaidEvent(
+            ReservationEntity reservationEntity,
+            PaymentResponseDto response
+    ) {
+        log.info("Sending ReservationPaidEvent to Kafka for reservation {}", reservationEntity.getId());
         kafkaTemplate.send(
                 reservationPaidTopic,
                 reservationEntity.getId(),
                 ReservationPaidEvent.builder()
                         .reservationId(reservationEntity.getId())
-                        .roomId(reservationEntity.getRoomId())
+                        .roomId(reservationEntity.getRoom().getId())
                         .build()
         );
     }
 
     public void processCleaningAssigned(CleaningAssignedEvent cleaningAssignedEvent) {
         var reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
-        if(!reservation.getPaymentStatus().equals(PaymentStatus.PAID)){
+
+        if(reservation.getPaymentStatus() != PaymentStatus.PAID){
             throw new IllegalStateException("Can't process cleaning assigned reservation");
         }
         reservation.setCleaningStatus(CleaningStatus.CLEAR);
         reservation.setCleanerId(cleaningAssignedEvent.cleanerId());
         repository.save(reservation);
+        log.info("Cleaning assigned and status updated for reservation {}",
+                cleaningAssignedEvent.reservationId());
     }
 
-    //вспомогательный приватный метод для processCleaningAssigned
     private ReservationEntity getReservationOrThrow(Long id){
         var reservationEntityOptional = repository.findById(id);
         return reservationEntityOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
     }
-
 }

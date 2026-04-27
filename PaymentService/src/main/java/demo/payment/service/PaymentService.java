@@ -22,12 +22,6 @@ public class PaymentService {
 
     public PaymentResponseDto makePayment(PaymentRequestDto requestDto) {
         log.info("Called makePayment");
-//        var found = paymentRepository.findByReservationId(requestDto.reservationId());
-//        if (found.isPresent()) {
-//            log.info("Found payment for reservation id {}", found.get().getReservationId());
-//            return paymentMapper.toResponseDto(found.get());
-//        }
-
         var paymentEntity = paymentMapper.toEntity(requestDto);
 
         //заглушка
@@ -35,14 +29,12 @@ public class PaymentService {
         if(requestDto.amount().intValue() % 2 == 0){
             paymentStatus = PaymentStatus.PAYMENT_FAILED;
             log.info("Payment failed");
-
         }
         else{
             paymentStatus = PaymentStatus.PAID;
             log.info("Payment successful");
         }
         paymentEntity.setPaymentStatus(paymentStatus);
-
         var savedEntity = paymentRepository.save(paymentEntity);
         return paymentMapper.toResponseDto(savedEntity);
     }

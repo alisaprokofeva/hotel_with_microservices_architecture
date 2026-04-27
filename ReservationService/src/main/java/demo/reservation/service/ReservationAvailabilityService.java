@@ -23,18 +23,17 @@ public class ReservationAvailabilityService {
             LocalDate startDate,
             LocalDate endDate
     ){
-        if(!endDate.isAfter(startDate)){
-            throw new IllegalArgumentException("Start date must be one day earlier than end date");
-        }
         List<Long> conflictingIds = repository.findConflictReservationIds(
                 roomId,
                 startDate,
                 endDate,
                 ReservationStatus.APPROVED
         );
+
         if(conflictingIds.isEmpty()){
             return true;
         }
+
         log.info("Conflict with ids = {}", conflictingIds);
         return false;
     }

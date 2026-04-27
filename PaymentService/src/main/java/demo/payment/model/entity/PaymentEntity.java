@@ -23,8 +23,9 @@ public class PaymentEntity {
     private Long id;
     @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     PaymentStatus paymentStatus;
-    @Column(name = "amount", nullable = false)
+    @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     BigDecimal amount;
 }

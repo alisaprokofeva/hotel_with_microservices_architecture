@@ -28,18 +28,18 @@ public class ReservationEntity {
     private Long userId;
     @Column(name="payment_id")
     private Long paymentId;
-    @Column(name="room_id", nullable = false)
-    private Long roomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private RoomEntity room;
     @Column(name="start_date", nullable = false)
     private LocalDate startDate;
     @Column(name="end_date", nullable = false)
     private LocalDate endDate;
-    @Column(name="amount")
+    @Column(name="amount", precision = 19, scale = 2)
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     @Column(name="reservation_status")
     private ReservationStatus reservationStatus;
-    //надо вынести в общее, пока добавила какую то dependency
     @Enumerated(EnumType.STRING)
     @Column(name="payment_status")
     private PaymentStatus paymentStatus;

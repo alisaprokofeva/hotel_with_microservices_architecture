@@ -15,11 +15,11 @@ public class PaymentMapper {
     }
 
     public PaymentResponseDto toResponseDto(PaymentEntity paymentEntity){
-        return new PaymentResponseDto(
-                paymentEntity.getId(),
-                paymentEntity.getReservationId(),
-                paymentEntity.getPaymentStatus(),
-                paymentEntity.getAmount()
-        );
+        return PaymentResponseDto.builder()
+                .paymentId(paymentEntity.getId())
+                .reservationId(paymentEntity.getReservationId())
+                .paymentStatus(paymentEntity.getPaymentStatus())
+                .amount(paymentEntity.getAmount())
+                .build();
     }
 }
