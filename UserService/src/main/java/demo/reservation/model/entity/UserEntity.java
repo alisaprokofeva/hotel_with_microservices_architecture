@@ -18,9 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "users")
 public class UserEntity implements UserDetails {
-    //надо будет связать этот айди с айди в ордер сервисе
-    //надо будет во всех таблицах подписать length
-    //надо будет везде IDENTITY въебать и может unique
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     @Column(name = "id", nullable = false)

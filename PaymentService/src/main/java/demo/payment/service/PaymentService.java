@@ -1,4 +1,3 @@
-//убрать lesson1 из pom.xml (name)
 
 package demo.payment.service;
 

@@ -62,7 +62,10 @@ public class CleaningService {
     }
 
     //вспомогательный метод для подтверджения уборки в комнате и сохранения сущности уборки в номере в бд
-    private CleaningEntity assignCleaning(Long reservationId, Long roomId) {
+    private CleaningEntity assignCleaning(
+            Long reservationId,
+            Long roomId
+    ) {
         List<CleaningEntity> cleaners = cleaningEntityRepository.findCleaningEntitiesByCleanerStatus(CleanerStatus.FREE);
         if(cleaners.isEmpty()){
             log.info("All cleaners are busy, room number {} need wait a few minutes", roomId);

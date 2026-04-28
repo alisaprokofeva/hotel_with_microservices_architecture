@@ -1,4 +1,3 @@
-//общая папка
 
 package demo.common.model.dto;
 

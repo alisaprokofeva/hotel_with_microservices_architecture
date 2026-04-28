@@ -26,8 +26,8 @@ public class AuthenticationService {
         var user = UserEntity.builder()
                 .name(request.name())
                 .email(request.email())
-                .password(passwordEncoder.encode(request.password())) // Шифруем!
-                .role(UserRole.USER) // Даем роль по умолчанию
+                .password(passwordEncoder.encode(request.password()))
+                .role(UserRole.USER)
                 .build();
 
         repository.save(user);
