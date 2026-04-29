@@ -24,7 +24,6 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping("/{id}")
-    //без RequestMapping надо было бы писать /reservation/{id}
     public ResponseEntity<ReservationResponseDto> getReservationById(
             @PathVariable("id") Long id,
             @RequestHeader("Authorization") String authorizationHeader
@@ -60,7 +59,7 @@ public class ReservationController {
                 .body(reservationService.createReservation(reservationToCreate, authorizationHeader));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<ReservationResponseDto> updateReservation(
             @PathVariable("id") Long id,
             @RequestBody @Valid ReservationRequestDto reservationToUpdate,
@@ -90,14 +89,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservation);
     }
 
-//    @PostMapping("/{id}/pay")
-//    public ResponseEntity<ReservationResponseDto> payReservation(
-//            @PathVariable("id") Long id,
-//            @RequestBody PaymentRequestDto paymentRequestDto
-//    ){
-//        var entity = reservationService.processPayment(id, paymentRequestDto);
-//        return reservationMapper.toResponseDto(entity);
-//    }
-//
+
 
 }

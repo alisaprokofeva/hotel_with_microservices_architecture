@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Table(name = "rooms")
 @Entity
@@ -22,4 +23,9 @@ public class RoomEntity {
 
     @Column(name = "price_per_night")
     private BigDecimal price;
+
+    @ElementCollection
+    @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls;
 }

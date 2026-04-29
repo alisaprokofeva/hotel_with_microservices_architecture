@@ -1,4 +1,8 @@
 package demo.reservation.model;
 
-public enum SearchAllByFilter {
+public record SearchByFilterDto(
+        Long roomId,
+        Integer pageSize,
+        Integer pageNumber
+) {
 }
