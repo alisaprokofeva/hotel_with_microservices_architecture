@@ -2,10 +2,13 @@ package demo.reservation.model;
 
 import jakarta.validation.constraints.NotNull;
 
-public record AuthenticationRequest(
+public record ResetPasswordWithTempDto(
         @NotNull
         String email,
         @NotNull
-        String password
+        String temporaryPassword,
+        @NotNull
+        String newPassword
 ) {
 }
+

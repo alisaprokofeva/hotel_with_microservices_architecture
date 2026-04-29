@@ -2,10 +2,11 @@ package demo.reservation.model;
 
 import jakarta.validation.constraints.NotNull;
 
-public record AuthenticationRequest(
+public record ChangePasswordRequest(
         @NotNull
-        String email,
+        String currentPassword,
         @NotNull
-        String password
+        String newPassword
 ) {
 }
+

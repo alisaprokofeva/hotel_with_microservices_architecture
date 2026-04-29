@@ -24,8 +24,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/api/v1/auth/authenticate").permitAll()
+                        .requestMatchers("/api/v1/auth/authenticate-with-temp").permitAll()
+                        .requestMatchers("/api/v1/auth/reset-password-with-temp").permitAll()
+                        .requestMatchers("/api/v1/auth/generate-temp-passwords").authenticated()
                         .requestMatchers("/api/v1/users/*/exists").permitAll()
+                        .requestMatchers("/api/v1/auth/change-password").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
