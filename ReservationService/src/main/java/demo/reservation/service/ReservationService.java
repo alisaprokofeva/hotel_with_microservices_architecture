@@ -320,7 +320,6 @@ public class ReservationService {
     }
 
 
-
     public void processCleaningAssigned(CleaningAssignedEvent cleaningAssignedEvent) {
         var reservation = getReservationOrThrow(cleaningAssignedEvent.reservationId());
 

@@ -61,7 +61,6 @@ public class CleaningService {
         );
     }
 
-    //вспомогательный метод для подтверджения уборки в комнате и сохранения сущности уборки в номере в бд
     private CleaningEntity assignCleaning(
             Long reservationId,
             Long roomId

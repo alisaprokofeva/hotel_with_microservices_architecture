@@ -36,9 +36,7 @@ public class UserController {
     public ResponseEntity<AuthenticationResponse> promoteToAdmin(
             @RequestParam(name = "secret") String secretKey
     ) {
-        log.info("Promoting current user to admin with secret key and returning new token");
         AuthenticationResponse response = userService.promoteToAdminWithSecretAndRefreshToken(secretKey);
-        log.info("User promoted to admin and new token generated");
         return ResponseEntity.ok(response);
     }
 
@@ -46,9 +44,7 @@ public class UserController {
     public ResponseEntity<AuthenticationResponse> promoteToAdminWithToken(
             @RequestParam(name = "secret") String secretKey
     ) {
-        log.info("Promoting current user to admin with secret key and returning new token");
         AuthenticationResponse response = userService.promoteToAdminWithSecretAndRefreshToken(secretKey);
-        log.info("User promoted to admin and new token generated");
         return ResponseEntity.ok(response);
     }
 
@@ -57,21 +53,17 @@ public class UserController {
             @PathVariable Long userId,
             @RequestHeader("Authorization") String authorizationHeader
     ) {
-        log.info("Admin attempting to promote user {} to admin", userId);
         UserResponseDto updatedUser = userService.promoteUserToAdmin(userId);
-        log.info("User {} promoted to admin by admin", userId);
         return ResponseEntity.ok(updatedUser);
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken() {
-        log.info("Refreshing token for current user");
         String email = org.springframework.security.core.context.SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName();
         AuthenticationResponse response = userService.refreshToken(email);
-        log.info("Token refreshed for user: {}", email);
         return ResponseEntity.ok(response);
     }
 }

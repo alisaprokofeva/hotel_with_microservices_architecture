@@ -104,12 +104,9 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse refreshToken(String email) {
-        log.info("Refreshing token for email: {}", email);
         var user = repository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        log.info("User found with role: {}", user.getRole());
         var jwtToken = jwtService.generateToken(user);
-        log.info("JWT token generated for user with role: {}", user.getRole());
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();

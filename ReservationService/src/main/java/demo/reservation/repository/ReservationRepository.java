@@ -24,7 +24,7 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
 
     @Query("SELECT r.id from ReservationEntity r " +
             "WHERE r.room.id = :roomId " +
-            "AND r.reservationStatus = :status " + // Проверяем только один статус
+            "AND r.reservationStatus = :status " +
             "AND :startDate < r.endDate " +
             "AND r.startDate < :endDate")
     List<Long> findConflictReservationIds(
