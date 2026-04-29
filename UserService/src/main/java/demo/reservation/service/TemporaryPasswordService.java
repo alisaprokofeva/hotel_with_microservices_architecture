@@ -72,15 +72,5 @@ public class TemporaryPasswordService {
 
         return false;
     }
-
-//    @Transactional(readOnly = true)
-//    public long getUnusedPasswordsCount(UserEntity user) {
-//        return repository.countByUserAndIsUsedFalse(user);
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public List<TemporaryPassword> getUnusedPasswords(UserEntity user) {
-//        return repository.findAllByUserAndIsUsedFalse(user);
-//    }
 }
 

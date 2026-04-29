@@ -5,6 +5,7 @@ import demo.reservation.service.AuthenticationService;
 import demo.reservation.service.TemporaryPasswordService;
 import demo.reservation.model.entity.UserEntity;
 import demo.reservation.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +21,14 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody UserRequestDto request
+            @RequestBody @Valid UserRequestDto request
     ) {
         return ResponseEntity.ok(service.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody @Valid AuthenticationRequest request
     ) {
         return ResponseEntity.ok(service.authenticate(request));
     }
@@ -54,14 +55,14 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate-with-temp")
     public ResponseEntity<AuthenticationResponse> authenticateWithTemp(
-            @RequestBody TemporaryPasswordAuthRequest request
+            @RequestBody @Valid TemporaryPasswordAuthRequest request
     ) {
         return ResponseEntity.ok(service.authenticateWithTemporaryPassword(request));
     }
 
     @PostMapping("/reset-password-with-temp")
     public ResponseEntity<AuthenticationResponse> resetPasswordWithTemporaryPassword(
-            @RequestBody ResetPasswordWithTempDto request
+            @RequestBody @Valid ResetPasswordWithTempDto request
     ) {
         return ResponseEntity.ok(service.resetPasswordWithTemporaryPassword(request));
     }
