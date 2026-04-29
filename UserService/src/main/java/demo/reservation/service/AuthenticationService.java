@@ -14,9 +14,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository repository;
@@ -99,5 +101,17 @@ public class AuthenticationService {
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         repository.save(user);
+    }
+
+    public AuthenticationResponse refreshToken(String email) {
+        log.info("Refreshing token for email: {}", email);
+        var user = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("User found with role: {}", user.getRole());
+        var jwtToken = jwtService.generateToken(user);
+        log.info("JWT token generated for user with role: {}", user.getRole());
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 }

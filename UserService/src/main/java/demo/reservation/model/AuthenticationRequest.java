@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record AuthenticationRequest(
         @NotNull
-        @Email(message = "Некорректный формат email")
+        @Email(message = "Uncorrect email format")
         String email,
         @NotNull
         String password

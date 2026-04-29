@@ -13,3 +13,7 @@ spring:
 
 server:
   port: 8083
+
+app:
+  admin-secret-key: ${ADMIN_SECRET_KEY:admin-secret-key-123}
+

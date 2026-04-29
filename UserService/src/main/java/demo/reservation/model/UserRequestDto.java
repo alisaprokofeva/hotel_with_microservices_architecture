@@ -7,7 +7,7 @@ public record UserRequestDto (
         @NotNull
         String name,
         @NotNull
-        @Email(message = "Некорректный формат email")
+        @Email(message = "Uncorrect email format")
         String email,
         @NotNull
         String password
