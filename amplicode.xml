@@ -22,6 +22,11 @@
           <package value="demo.reservation" />
         </packages>
       </persistence-unit>
+      <persistence-unit moduleName="reservation-service" name="Default">
+        <packages>
+          <package value="demo" />
+        </packages>
+      </persistence-unit>
     </persistence-units>
   </component>
 </project>

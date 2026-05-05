@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html class="light" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LuxeStay — Бронирование</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0F172A",
+                        "background": "#f1f5f9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#45464d"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "gutter": "24px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .room-card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+
+        /* Стили для заднего фона из шаблона */
+        .bg-overlay {
+            background: linear-gradient(rgba(19, 27, 46, 0.8), rgba(19, 27, 46, 0.95)),
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .modal-animate { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<!-- Применил класс bg-overlay здесь -->
+<body class="bg-overlay text-on-background min-h-screen">
+
+<header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40 h-20 border-b border-gray-200">
+    <div class="flex justify-between items-center w-full px-4 md:px-gutter max-w-container-max mx-auto h-20">
+        <div class="text-2xl font-bold text-primary tracking-tight">LuxeStay</div>
+
+        <div class="flex items-center gap-8">
+            <nav class="flex gap-8">
+                <a href="rooms.html" class="text-sm font-bold text-primary uppercase tracking-widest border-b-2 border-primary">Номера</a>
+                <a href="profile.html" class="text-sm font-bold text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">Профиль</a>
+            </nav>
+            <div class="h-6 w-[1px] bg-gray-200"></div>
+            <button onclick="logout()" class="font-bold text-xs text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
+                Выйти
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-container-max mx-auto px-4 md:px-gutter py-12">
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Available Rooms</h1>
+        <p class="text-lg text-gray-300 font-medium">Выберите подходящий номер и даты заезда.</p>
+    </div>
+
+    <div id="rooms-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        <div id="loader" class="col-span-full text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
+        </div>
+    </div>
+</main>
+
+<div id="date-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl modal-animate">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-primary">Выбор дат</h2>
+            <button onclick="closeDateModal()" class="text-gray-400 hover:text-primary text-2xl font-light">&times;</button>
+        </div>
+
+        <div class="flex flex-col gap-5">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Дата заезда</label>
+                <input type="date" id="start-date" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none font-medium">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Дата выезда</label>
+                <input type="date" id="end-date" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary/20 outline-none font-medium">
+            </div>
+            <button id="btn-confirm-booking" class="w-full bg-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-primary/20">
+                Забронировать
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/room.js"></script>
+<script>
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    }
+</script>
+</body>
+</html>

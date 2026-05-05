@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LuxeStay | Modern Hospitality</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Палитра с твоего фото
+                        "primary": "#0F172A",     // Deep Navy
+                        "secondary": "#B38B3F",   // Gold
+                        "tertiary": "#334155",    // Slate
+                        "neutral-bg": "#F8FAFC",  // Off-white surface
+                        "surface-card": "#FFFFFF"
+                    },
+                    fontFamily: {
+                        "sans": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .auth-tab-active {
+            color: #B38B3F;
+            border-bottom: 2px solid #B38B3F;
+        }
+        .bg-auth-overlay {
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)),
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+        }
+        .dot-pattern {
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-bg text-primary min-h-screen flex flex-col">
+
+<header class="bg-white border-b border-slate-200 py-6 relative overflow-hidden">
+    <div class="absolute inset-0 dot-pattern"></div>
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center relative z-10">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-3xl">BEDTIME</span>
+            <span class="font-extrabold text-2xl tracking-tight uppercase">LuxeStay</span>
+        </div>
+        <div class="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-bold hidden md:block">
+            Modern Hospitality Collective
+        </div>
+    </div>
+</header>
+
+<main class="flex-grow bg-auth-overlay flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+
+        <!-- Левая колонка: Визуал -->
+        <div class="hidden lg:flex flex-col justify-between p-12 bg-primary relative overflow-hidden">
+            <div class="absolute inset-0 opacity-40">
+                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+            </div>
+            <div class="relative z-10">
+                <div class="w-12 h-1 bg-secondary mb-6"></div>
+                <h1 class="text-4xl font-bold text-white leading-tight mb-4">
+                    The new standard of <span class="text-secondary">traveling.</span>
+                </h1>
+                <p class="text-slate-300 font-light leading-relaxed">
+                    Access your account to manage luxury reservations and personalized services.
+                </p>
+            </div>
+            <div class="relative z-10 flex gap-4">
+                <div class="p-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/10">
+                    <span class="material-symbols-outlined text-secondary">verified_user</span>
+                </div>
+                <div class="p-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/10">
+                    <span class="material-symbols-outlined text-secondary">encrypted</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка: Формы -->
+        <div class="p-8 md:p-12">
+            <!-- Табы -->
+            <div class="flex gap-8 border-b border-slate-100 mb-10">
+                <button id="tab-login" onclick="switchTab('login')" class="pb-4 font-bold text-sm uppercase tracking-widest auth-tab-active transition-all">Sign In</button>
+                <button id="tab-register" onclick="switchTab('register')" class="pb-4 font-bold text-sm uppercase tracking-widest text-slate-400 hover:text-secondary transition-all">Register</button>
+                <button id="tab-temp" onclick="switchTab('temp')" class="pb-4 font-bold text-sm uppercase tracking-widest text-slate-400 hover:text-secondary transition-all">Quick Access</button>
+            </div>
+
+            <!-- Форма Входа -->
+            <div id="form-login" class="space-y-6">
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Email Address</label>
+                    <input id="login-email" type="email" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="name@example.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Password</label>
+                    <input id="login-password" type="password" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="••••••••">
+                </div>
+                <button id="btn-login" class="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg">Sign In</button>
+            </div>
+
+            <!-- Форма Регистрации -->
+            <div id="form-register" class="hidden space-y-6">
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Full Name</label>
+                    <input id="reg-name" type="text" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="John Doe">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Email Address</label>
+                    <input id="reg-email" type="email" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="email@luxe.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Password</label>
+                    <input id="reg-password" type="password" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="••••••••">
+                </div>
+                <button id="btn-register" class="w-full bg-secondary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-lg">Create Account</button>
+            </div>
+
+            <!-- Форма Временного доступа -->
+            <div id="form-temp" class="hidden space-y-6">
+                <div class="p-4 bg-secondary/5 rounded-xl border border-secondary/10 text-xs text-secondary leading-relaxed">
+                    Use the unique code generated by your administrator to access your account instantly.
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Email Address</label>
+                    <input id="temp-email" type="email" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="email@luxe.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Temporary Access Code</label>
+                    <input id="temp-code" type="text" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="LX-000-000">
+                </div>
+                <button id="btn-temp-login" class="w-full bg-tertiary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-600 transition-all shadow-lg">Verify & Enter</button>
+            </div>
+
+            <p class="mt-10 text-center text-[10px] text-slate-400 uppercase tracking-widest">
+                Protected by 256-bit SSL encryption
+            </p>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-white py-8 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-xs text-slate-400">© 2026 LuxeStay Modern Hospitality. All rights reserved.</p>
+        <div class="flex gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <a href="#" class="hover:text-secondary transition-colors">Privacy</a>
+            <a href="#" class="hover:text-secondary transition-colors">Terms</a>
+            <a href="#" class="hover:text-secondary transition-colors">Support</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function switchTab(tab) {
+        const tabs = ['login', 'register', 'temp'];
+        tabs.forEach(t => {
+            const form = document.getElementById('form-' + t);
+            const tabBtn = document.getElementById('tab-' + t);
+            if (t === tab) {
+                form.classList.remove('hidden');
+                tabBtn.classList.add('auth-tab-active');
+                tabBtn.classList.remove('text-slate-400');
+            } else {
+                form.classList.add('hidden');
+                tabBtn.classList.remove('auth-tab-active');
+                tabBtn.classList.add('text-slate-400');
+            }
+        });
+    }
+</script>
+
+<!-- Твои скрипты связи с бэкендом -->
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>
