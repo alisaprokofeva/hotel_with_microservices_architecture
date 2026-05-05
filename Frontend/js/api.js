@@ -6,7 +6,7 @@ const CONFIG = {
     USER_SERVICE: 'http://localhost:8083/api/v1/users'
 };
 
- */
+
 async function request(baseUrl, endpoint, method = 'GET', data = null) {
     const token = localStorage.getItem('token'); 
 
