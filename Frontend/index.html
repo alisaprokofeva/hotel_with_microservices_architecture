@@ -13,11 +13,10 @@
             theme: {
                 extend: {
                     colors: {
-                        // Палитра с твоего фото
-                        "primary": "#0F172A",     // Deep Navy
-                        "secondary": "#B38B3F",   // Gold
-                        "tertiary": "#334155",    // Slate
-                        "neutral-bg": "#F8FAFC",  // Off-white surface
+                        "primary": "#0F172A",
+                        "secondary": "#B38B3F",
+                        "tertiary": "#334155",
+                        "neutral-bg": "#F8FAFC",
                         "surface-card": "#FFFFFF"
                     },
                     fontFamily: {
@@ -93,10 +92,11 @@
         <!-- Правая колонка: Формы -->
         <div class="p-8 md:p-12">
             <!-- Табы -->
-            <div class="flex gap-8 border-b border-slate-100 mb-10">
-                <button id="tab-login" onclick="switchTab('login')" class="pb-4 font-bold text-sm uppercase tracking-widest auth-tab-active transition-all">Sign In</button>
-                <button id="tab-register" onclick="switchTab('register')" class="pb-4 font-bold text-sm uppercase tracking-widest text-slate-400 hover:text-secondary transition-all">Register</button>
-                <button id="tab-temp" onclick="switchTab('temp')" class="pb-4 font-bold text-sm uppercase tracking-widest text-slate-400 hover:text-secondary transition-all">Quick Access</button>
+            <div class="flex gap-4 border-b border-slate-100 mb-10 overflow-x-auto pb-2">
+                <button id="tab-login" onclick="switchTab('login')" class="pb-2 font-bold text-xs uppercase tracking-widest auth-tab-active transition-all whitespace-nowrap">Sign In</button>
+                <button id="tab-register" onclick="switchTab('register')" class="pb-2 font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-secondary transition-all whitespace-nowrap">Register</button>
+                <button id="tab-temp" onclick="switchTab('temp')" class="pb-2 font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-secondary transition-all whitespace-nowrap">Quick Access</button>
+                <button id="tab-reset" onclick="switchTab('reset')" class="pb-2 font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-secondary transition-all whitespace-nowrap">Reset Pass</button>
             </div>
 
             <!-- Форма Входа -->
@@ -145,6 +145,26 @@
                 <button id="btn-temp-login" class="w-full bg-tertiary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-600 transition-all shadow-lg">Verify & Enter</button>
             </div>
 
+            <!-- Форма Сброса пароля -->
+            <div id="form-reset" class="hidden space-y-6">
+                <div class="p-4 bg-secondary/5 rounded-xl border border-secondary/10 text-xs text-secondary leading-relaxed">
+                    Set a new password using your temporary access code.
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Email Address</label>
+                    <input id="reset-email" type="email" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="email@luxe.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">Temporary Access Code</label>
+                    <input id="reset-code" type="text" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="LX-000-000">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-extrabold uppercase tracking-widest text-slate-500 mb-2">New Password</label>
+                    <input id="reset-password" type="password" class="w-full bg-slate-50 border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-slate-300" placeholder="••••••••">
+                </div>
+                <button id="btn-reset-password" class="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg">Set New Password</button>
+            </div>
+
             <p class="mt-10 text-center text-[10px] text-slate-400 uppercase tracking-widest">
                 Protected by 256-bit SSL encryption
             </p>
@@ -165,7 +185,7 @@
 
 <script>
     function switchTab(tab) {
-        const tabs = ['login', 'register', 'temp'];
+        const tabs = ['login', 'register', 'temp', 'reset'];
         tabs.forEach(t => {
             const form = document.getElementById('form-' + t);
             const tabBtn = document.getElementById('tab-' + t);

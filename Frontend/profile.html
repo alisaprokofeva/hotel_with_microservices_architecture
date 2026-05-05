@@ -49,10 +49,18 @@
                 <div class="pt-6 border-t border-white/10">
                     <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-4 font-bold">Доступ в номер</p>
                     <button id="btn-generate-pass" onclick="generatePass()"
-                            class="w-full bg-[#F8F4F0] text-slate-900 py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-white active:scale-95 shadow-lg">
+                            class="w-full bg-[#F8F4F0] text-slate-900 py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-white active:scale-95 shadow-lg mb-3">
                         Получить временный код
                     </button>
-                    <div id="pass-display" class="mt-6 font-mono text-3xl tracking-[0.4em] text-[#F8F4F0] font-extrabold hidden">0000</div>
+                    <div id="pass-display" class="mt-2 mb-4 font-mono text-3xl tracking-[0.4em] text-[#F8F4F0] font-extrabold hidden">0000</div>
+                    
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-4 mt-6 font-bold">Настройки</p>
+                    <button onclick="showChangePasswordModal()" class="w-full border border-white/20 text-white py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-white/10 active:scale-95 mb-3">
+                        Сменить пароль
+                    </button>
+                    <button onclick="showAdminModal()" class="w-full border border-white/20 text-white py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-white/10 active:scale-95">
+                        Права администратора
+                    </button>
                 </div>
             </div>
         </aside>
@@ -72,6 +80,74 @@
         </div>
     </div>
 </main>
+
+<!-- Modals -->
+<!-- Редактирование бронирования -->
+<div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl transform transition-all duration-300 scale-100">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Редактирование</h2>
+            <button onclick="hideEditModal()" class="text-gray-400 hover:text-slate-900 text-2xl font-light">&times;</button>
+        </div>
+        <div class="flex flex-col gap-5">
+            <input type="hidden" id="edit-reservation-id">
+            <input type="hidden" id="edit-room-id">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Дата заезда</label>
+                <input type="date" id="edit-start-date" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-slate-900/20 outline-none font-medium text-slate-900">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Дата выезда</label>
+                <input type="date" id="edit-end-date" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-slate-900/20 outline-none font-medium text-slate-900">
+            </div>
+            <button onclick="submitEditReservation()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-slate-800 transition-all active:scale-95 shadow-lg">
+                Сохранить
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Смена пароля -->
+<div id="change-password-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl transform transition-all duration-300 scale-100">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Смена пароля</h2>
+            <button onclick="hideChangePasswordModal()" class="text-gray-400 hover:text-slate-900 text-2xl font-light">&times;</button>
+        </div>
+        <div class="flex flex-col gap-5">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Текущий пароль</label>
+                <input type="password" id="old-password" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-slate-900/20 outline-none font-medium text-slate-900">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Новый пароль</label>
+                <input type="password" id="new-password" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-slate-900/20 outline-none font-medium text-slate-900">
+            </div>
+            <button onclick="changePassword()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-slate-800 transition-all active:scale-95 shadow-lg">
+                Сохранить
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Права администратора -->
+<div id="admin-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl transform transition-all duration-300 scale-100">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Доступ администратора</h2>
+            <button onclick="hideAdminModal()" class="text-gray-400 hover:text-slate-900 text-2xl font-light">&times;</button>
+        </div>
+        <div class="flex flex-col gap-5">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Секретный ключ</label>
+                <input type="text" id="admin-secret" class="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-slate-900/20 outline-none font-medium text-slate-900" placeholder="Введите ключ">
+            </div>
+            <button onclick="promoteToAdmin()" class="w-full bg-[#B38B3F] text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg">
+                Подтвердить
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- ПОРЯДОК СКРИПТОВ КРИТИЧЕН -->
 <script src="js/api.js"></script>

@@ -42,6 +42,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDto);
     }
 
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<ErrorResponceDto> handleResponseStatusException(
+            org.springframework.web.server.ResponseStatusException e
+    ){
+        var errorDto = new ErrorResponceDto(
+                e.getReason() != null ? e.getReason() : "Error",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+        log.error("Handle ResponseStatusException: {}", e.getMessage());
+        return ResponseEntity.status(e.getStatusCode()).body(errorDto);
+    }
+
     @ExceptionHandler(exception = {IllegalArgumentException.class,
             IllegalStateException.class,
             MethodArgumentNotValidException.class

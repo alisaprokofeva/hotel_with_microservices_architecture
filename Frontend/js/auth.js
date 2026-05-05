@@ -1,4 +1,3 @@
-// --- РЕГИСТРАЦИЯ ---
 document.getElementById('btn-register').onclick = async () => {
     const payload = {
         name: document.getElementById('reg-name').value,
@@ -15,7 +14,6 @@ document.getElementById('btn-register').onclick = async () => {
     }
 };
 
-// --- ОБЫЧНЫЙ ВХОД ---
 document.getElementById('btn-login').onclick = async () => {
     const payload = {
         email: document.getElementById('login-email').value,
@@ -26,7 +24,6 @@ document.getElementById('btn-login').onclick = async () => {
         const data = await authApi.post('/authenticate', payload);
         if (data.token) {
             localStorage.setItem('token', data.token);
-            // Перекидываем на страницу с комнатами
             window.location.href = 'rooms.html';
         }
     } catch (err) {
@@ -34,7 +31,6 @@ document.getElementById('btn-login').onclick = async () => {
     }
 };
 
-// --- ВХОД ПО ВРЕМЕННОМУ ПАРОЛЮ ---
 document.getElementById('btn-temp-login').onclick = async () => {
     const payload = {
         email: document.getElementById('temp-email').value,
@@ -51,3 +47,28 @@ document.getElementById('btn-temp-login').onclick = async () => {
         alert('Доступ запрещен: ' + err.message);
     }
 };
+
+const btnReset = document.getElementById('btn-reset-password');
+if(btnReset) {
+    btnReset.onclick = async () => {
+        const payload = {
+            email: document.getElementById('reset-email').value,
+            temporaryPassword: document.getElementById('reset-code').value,
+            newPassword: document.getElementById('reset-password').value
+        };
+
+        try {
+            const data = await authApi.post('/reset-password-with-temp', payload);
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                alert('Пароль успешно сброшен!');
+                window.location.href = 'rooms.html';
+            } else {
+                alert('Пароль сброшен! Теперь войдите с новым паролем.');
+                switchTab('login');
+            }
+        } catch (err) {
+            alert('Ошибка сброса: ' + err.message);
+        }
+    };
+}

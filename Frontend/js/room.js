@@ -51,13 +51,46 @@ function openDateModal(roomId) {
 
     document.getElementById('start-date').value = today;
     document.getElementById('end-date').value = tomorrow;
-    document.getElementById('date-modal').classList.remove('hidden');
+    
+    const resultDiv = document.getElementById('availability-result');
+    if (resultDiv) {
+        resultDiv.classList.add('hidden');
+        resultDiv.innerText = '';
+    }
 
+    document.getElementById('date-modal').classList.remove('hidden');
     document.getElementById('btn-confirm-booking').onclick = executeBooking;
 }
 
 function closeDateModal() {
     document.getElementById('date-modal').classList.add('hidden');
+}
+
+async function checkAvailability() {
+    const start = document.getElementById('start-date').value;
+    const end = document.getElementById('end-date').value;
+    const resultDiv = document.getElementById('availability-result');
+
+    if (!start || !end) {
+        alert("Пожалуйста, выберите даты.");
+        return;
+    }
+
+    try {
+        const response = await request(CONFIG.RESERVATION_SERVICE, '/reservation/availability/check', 'POST', {
+            roomId: selectedRoomId,
+            startDate: start,
+            endDate: end
+        });
+
+        resultDiv.classList.remove('hidden', 'text-red-500');
+        resultDiv.classList.add('text-green-500');
+        resultDiv.innerText = response.message || "Номер доступен на выбранные даты!";
+    } catch (err) {
+        resultDiv.classList.remove('hidden', 'text-green-500');
+        resultDiv.classList.add('text-red-500');
+        resultDiv.innerText = "Номер занят или произошла ошибка: " + err.message;
+    }
 }
 
 async function executeBooking() {
@@ -79,7 +112,6 @@ async function executeBooking() {
         alert("Бронирование успешно создано! Теперь оно доступно в вашем профиле.");
         closeDateModal();
     } catch (err) {
-        // Ошибка отобразится, если номер занят на эти даты
         alert("Ошибка бронирования: " + err.message);
     }
 }
